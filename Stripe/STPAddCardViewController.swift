@@ -68,6 +68,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
     /// The API Client to use to make requests.
     /// Defaults to `STPAPIClient.shared`
     public var apiClient: STPAPIClient = STPAPIClient.shared
+    public var useCardParams: Bool = false
     
     /// The API Client to use to make requests.
     /// Defaults to `STPAPIClient.shared`.
@@ -435,39 +436,52 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
         guard let cardParams = paymentCell?.paymentField?.cardParams else {
             return
         }
-        // Create and return a Payment Method
-        let billingDetails = STPPaymentMethodBillingDetails()
-        if configuration?.requiredBillingAddressFields == .postalCode {
-            let address = STPAddress()
-            address.postalCode = paymentCell?.paymentField?.postalCode
-            billingDetails.address = STPPaymentMethodAddress(address: address)
+        
+        if useCardParams {
+            delegate?.addCardViewController(self, didCreateWithCard: cardParams) { attachToCustomerError in
+                stpDispatchToMainThreadIfNecessary({
+                    if let attachToCustomerError = attachToCustomerError {
+                        self.handleError(attachToCustomerError)
+                    } else {
+                        self.loading = false
+                    }
+                })
+            }
         } else {
-            billingDetails.address = STPPaymentMethodAddress(address: addressViewModel.address)
-            billingDetails.email = addressViewModel.address.email
-            billingDetails.name = addressViewModel.address.name
-            billingDetails.phone = addressViewModel.address.phone
-        }
-        let paymentMethodParams = STPPaymentMethodParams(
-            card: cardParams,
-            billingDetails: billingDetails,
-            metadata: nil)
-        apiClient.createPaymentMethod(with: paymentMethodParams) {
-            paymentMethod, createPaymentMethodError in
-            if let createPaymentMethodError = createPaymentMethodError {
-                self.handleError(createPaymentMethodError)
+            // Create and return a Payment Method
+            let billingDetails = STPPaymentMethodBillingDetails()
+            if configuration?.requiredBillingAddressFields == .postalCode {
+                let address = STPAddress()
+                address.postalCode = paymentCell?.paymentField?.postalCode
+                billingDetails.address = STPPaymentMethodAddress(address: address)
             } else {
-                if let paymentMethod = paymentMethod {
-                    self.delegate?.addCardViewController(
-                        self, didCreatePaymentMethod: paymentMethod
-                    ) {
-                        attachToCustomerError in
-                        stpDispatchToMainThreadIfNecessary({
-                            if let attachToCustomerError = attachToCustomerError {
-                                self.handleError(attachToCustomerError)
-                            } else {
-                                self.loading = false
-                            }
-                        })
+                billingDetails.address = STPPaymentMethodAddress(address: addressViewModel.address)
+                billingDetails.email = addressViewModel.address.email
+                billingDetails.name = addressViewModel.address.name
+                billingDetails.phone = addressViewModel.address.phone
+            }
+            let paymentMethodParams = STPPaymentMethodParams(
+                card: cardParams,
+                billingDetails: billingDetails,
+                metadata: nil)
+            apiClient.createPaymentMethod(with: paymentMethodParams) {
+                paymentMethod, createPaymentMethodError in
+                if let createPaymentMethodError = createPaymentMethodError {
+                    self.handleError(createPaymentMethodError)
+                } else {
+                    if let paymentMethod = paymentMethod {
+                        self.delegate?.addCardViewController(
+                            self, didCreatePaymentMethod: paymentMethod
+                        ) {
+                            attachToCustomerError in
+                            stpDispatchToMainThreadIfNecessary({
+                                if let attachToCustomerError = attachToCustomerError {
+                                    self.handleError(attachToCustomerError)
+                                } else {
+                                    self.loading = false
+                                }
+                            })
+                        }
                     }
                 }
             }
@@ -827,6 +841,12 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
     @objc func addCardViewController(
         _ addCardViewController: STPAddCardViewController,
         didCreatePaymentMethod paymentMethod: STPPaymentMethod,
+        completion: @escaping STPErrorBlock
+    )
+    
+    @objc optional func addCardViewController(
+        _ addCardViewController: STPAddCardViewController,
+        didCreateWithCard cardParams: STPPaymentMethodCardParams,
         completion: @escaping STPErrorBlock
     )
 
