@@ -438,7 +438,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
         }
         
         if useCardParams {
-            delegate?.addCardViewController(self, didCreateWithCard: cardParams) { attachToCustomerError in
+            delegate?.addCardViewController?(self, didCreateWithCard: cardParams) { attachToCustomerError in
                 stpDispatchToMainThreadIfNecessary({
                     if let attachToCustomerError = attachToCustomerError {
                         self.handleError(attachToCustomerError)
@@ -470,7 +470,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
                     self.handleError(createPaymentMethodError)
                 } else {
                     if let paymentMethod = paymentMethod {
-                        self.delegate?.addCardViewController(
+                        self.delegate?.addCardViewController?(
                             self, didCreatePaymentMethod: paymentMethod
                         ) {
                             attachToCustomerError in
@@ -838,7 +838,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
     ///   - addCardViewController: the view controller that successfully created a token
     ///   - paymentMethod:         the Payment Method that was created. - seealso: STPPaymentMethod
     ///   - completion:            call this callback when you're done sending the token to your backend
-    @objc func addCardViewController(
+    @objc optional func addCardViewController(
         _ addCardViewController: STPAddCardViewController,
         didCreatePaymentMethod paymentMethod: STPPaymentMethod,
         completion: @escaping STPErrorBlock
