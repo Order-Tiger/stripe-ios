@@ -76,7 +76,6 @@ import UIKit
     }
 
     /// The content layer to use on iOS >= 12. This layer resembles a spiraling comet.
-    @available(iOS 12.0, *)
     private lazy var cometLayer: CAGradientLayer = {
         let shape = CAShapeLayer()
         shape.path = makeArcPath(radius: radius, startAngle: 0.05, endAngle: 0.95)
