@@ -85,7 +85,11 @@ import UIKit
         shape.fillColor = UIColor.clear.cgColor
 
         let gradientLayer = CAGradientLayer()
-        gradientLayer.type = .conic // Conic gradient requires iOS >= 12.0
+        if #available(iOS 12.0, *) {
+            gradientLayer.type = .conic
+        } else {
+            // Fallback on earlier versions
+        } // Conic gradient requires iOS >= 12.0
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         gradientLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
