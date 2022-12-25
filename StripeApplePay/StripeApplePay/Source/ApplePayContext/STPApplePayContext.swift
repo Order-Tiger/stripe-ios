@@ -235,6 +235,25 @@ public class STPApplePayContext: NSObject, PKPaymentAuthorizationControllerDeleg
                 @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
             ) -> Void
         )?
+        // HACK: This signature changed in Xcode 14, we need to check the compiler version to choose the right signature.
+#if compiler(>=5.7)
+        typealias pkDidSelectShippingMethodSignature =
+        (any PKPaymentAuthorizationControllerDelegate) -> (
+            (
+                PKPaymentAuthorizationController,
+                PKShippingMethod,
+                @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
+            ) -> Void
+        )?
+#else
+        typealias pkDidSelectShippingMethodSignature = (
+            (PKPaymentAuthorizationControllerDelegate) -> (
+                PKPaymentAuthorizationController, PKShippingMethod,
+                @escaping (PKPaymentRequestShippingMethodUpdate) -> Void
+            ) -> Void
+        )?
+#endif
+        
         let pk_didSelectShippingMethod = #selector(
             (PKPaymentAuthorizationControllerDelegate.paymentAuthorizationController(
                 _:didSelectShippingMethod:handler:)) as pkDidSelectShippingMethodSignature)
@@ -244,7 +263,8 @@ public class STPApplePayContext: NSObject, PKPaymentAuthorizationControllerDeleg
             PKPaymentAuthorizationControllerDelegate.paymentAuthorizationController(
                 _:didSelectShippingContact:handler:))
         let stp_didSelectShippingContact = #selector(
-            _stpinternal_STPApplePayContextDelegateBase.applePayContext(_:didSelectShippingContact:handler:))
+            _stpinternal_STPApplePayContextDelegateBase.applePayContext(
+                _:didSelectShippingContact:handler:))
 
         return [
             pk_didSelectShippingMethod: stp_didSelectShippingMethod,
