@@ -15,6 +15,7 @@ protocol LoadingViewControllerDelegate: AnyObject {
 
 /// This just displays a spinner
 /// For internal SDK use only
+@available(iOS 13.0, *)
 @objc(STP_Internal_LoadingViewController)
 class LoadingViewController: UIViewController, BottomSheetContentViewController {
     lazy var navigationBar: SheetNavigationBar = {
