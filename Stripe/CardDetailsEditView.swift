@@ -87,7 +87,7 @@ class CardDetailsEditView: UIView, STP_Internal_CardScanningViewDelegate {
         }
     }
 
-    @available(iOS 13, macCatalyst 14, *)
+//    @available(iOS 13, macCatalyst 14, *)
     lazy var cardScanningView: CardScanningView? = {
         if !STPCardScanner.cardScanningAvailable() {
             return nil  // Don't initialize the scanner

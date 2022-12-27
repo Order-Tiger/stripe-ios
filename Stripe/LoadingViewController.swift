@@ -41,7 +41,7 @@ class LoadingViewController: UIViewController, BottomSheetContentViewController 
     #if targetEnvironment(macCatalyst)
     let activityIndicator = UIActivityIndicatorView(style: .medium)
     #else
-    let activityIndicator = UIActivityIndicatorView(style: .gray)
+    let activityIndicator = UIActivityIndicatorView(style: .medium)
     #endif
     weak var delegate: LoadingViewControllerDelegate?
 

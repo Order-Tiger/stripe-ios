@@ -397,7 +397,7 @@ extension PaymentSheet: PayWithLinkViewControllerDelegate {
 }
 
 // MARK: - Link
-
+@available(iOSApplicationExtension, unavailable)
 private extension PaymentSheet {
 
     func presentPayWithLinkController(

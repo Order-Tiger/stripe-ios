@@ -1613,7 +1613,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate {
     }
 }
 
-@available(iOSApplicationExtension, unavailable)
+//@available(iOSApplicationExtension, unavailable)
 @available(macCatalystApplicationExtension, unavailable)
 /// :nodoc:
 @_spi(STP) extension STPPaymentHandler: STPURLCallbackListener {
