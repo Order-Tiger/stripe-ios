@@ -130,7 +130,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
     private weak var cardImageView: UIImageView?
     private var doneItem: UIBarButtonItem?
     private var cardHeaderView: STPSectionHeaderView?
-    @available(iOS 13, macCatalyst 14, *)
+//    @available(iOS 13, macCatalyst 14, *)
     private lazy var cardScanner: STPCardScanner? = nil
     @available(macCatalyst 14, *)
     private lazy var scannerCell: STPCardScannerTableViewCell? = nil
@@ -771,7 +771,7 @@ public class STPAddCardViewController: STPCoreTableViewController, STPAddressVie
 
     static let cardScannerKSTPCardScanAnimationTime: TimeInterval = 0.04
 
-    @available(iOS 13, macCatalyst 14, *)
+//    @available(iOS 13, macCatalyst 14, *)
     func cardScanner(
         _ scanner: STPCardScanner, didFinishWith cardParams: STPPaymentMethodCardParams?,
         error: Error?

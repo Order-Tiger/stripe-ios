@@ -65,7 +65,7 @@ class CardDetailsEditView: UIView, STP_Internal_CardScanningViewDelegate {
     }()
 
     // Card scanning
-    @available(iOS 13, macCatalyst 14, *)
+//    @available(iOS 13, macCatalyst 14, *)
     func cardScanningView(
         _ cardScanningView: CardScanningView, didFinishWith cardParams: STPPaymentMethodCardParams?
     ) {
@@ -87,7 +87,7 @@ class CardDetailsEditView: UIView, STP_Internal_CardScanningViewDelegate {
         }
     }
 
-    @available(iOS 13, macCatalyst 14, *)
+//    @available(iOS 13.0, *)
     lazy var cardScanningView: CardScanningView? = {
         if !STPCardScanner.cardScanningAvailable() {
             return nil  // Don't initialize the scanner
@@ -97,7 +97,7 @@ class CardDetailsEditView: UIView, STP_Internal_CardScanningViewDelegate {
         scanningView.isHidden = true
         return scanningView
     }()
-
+    
     weak var lastScanButton: UIButton?
     @objc func scanButtonTapped(_ button: UIButton) {
         if #available(iOS 13.0, macCatalyst 14.0, *) {

@@ -17,14 +17,14 @@ enum STPCardScannerError: Int {
     case cameraNotAvailable
 }
 
-@available(iOS 13, macCatalyst 14, *)
+//@available(iOS 13, macCatalyst 14, *)
 @objc protocol STPCardScannerDelegate: NSObjectProtocol {
     @objc(cardScanner:didFinishWithCardParams:error:) func cardScanner(
         _ scanner: STPCardScanner, didFinishWith cardParams: STPPaymentMethodCardParams?,
         error: Error?)
 }
 
-@available(iOS 13, macCatalyst 14, *)
+//@available(iOS 13, macCatalyst 14, *)
 class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     // iOS will kill the app if it tries to request the camera without an NSCameraUsageDescription
     static let cardScanningAvailableCameraHasUsageDescription = {
@@ -96,7 +96,11 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         if isScanning {
             return
         }
-        STPAnalyticsClient.sharedClient.addClass(toProductUsageIfNecessary: STPCardScanner.self)
+        if #available(iOSApplicationExtension 13, *) {
+            STPAnalyticsClient.sharedClient.addClass(toProductUsageIfNecessary: STPCardScanner.self)
+        } else {
+            // Fallback on earlier versions
+        }
         startTime = Date()
 
         isScanning = true
@@ -133,7 +137,27 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     private var captureSessionQueue: DispatchQueue?
     private var videoDataOutput: AVCaptureVideoDataOutput?
     private var videoDataOutputQueue: DispatchQueue?
-    private var textRequest: VNRecognizeTextRequest?
+    
+    private var _textRequest: Any? = nil
+    @available(iOS 13.0, *)
+    fileprivate var textRequest: VNRecognizeTextRequest {
+        if _textRequest == nil {
+            weak var weakSelf = self
+            _textRequest = VNRecognizeTextRequest(completionHandler: { request, error in
+                let strongSelf = weakSelf
+                if !(strongSelf?.isScanning ?? false) {
+                    return
+                }
+                if error != nil {
+                    strongSelf?.stopWithError(STPCardScanner.stp_cardScanningError())
+                    return
+                }
+                strongSelf?.processVNRequest(request)
+            })
+        }
+        return _textRequest as! VNRecognizeTextRequest
+    }
+    
     private var isScanning = false
     private var didTimeout = false
     private var timeoutStarted = false
@@ -176,19 +200,6 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
 
     // MARK: Setup
     func setupCamera() {
-        weak var weakSelf = self
-        textRequest = VNRecognizeTextRequest(completionHandler: { request, error in
-            let strongSelf = weakSelf
-            if !(strongSelf?.isScanning ?? false) {
-                return
-            }
-            if error != nil {
-                strongSelf?.stopWithError(STPCardScanner.stp_cardScanningError())
-                return
-            }
-            strongSelf?.processVNRequest(request)
-        })
-
         let captureDevice = AVCaptureDevice.default(
             .builtInWideAngleCamera, for: .video, position: .back)
         self.captureDevice = captureDevice
@@ -259,99 +270,112 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         if pixelBuffer == nil {
             return
         }
-        textRequest?.recognitionLevel = .accurate
-        textRequest?.usesLanguageCorrection = false
-        textRequest?.regionOfInterest = regionOfInterest
+        if #available(iOSApplicationExtension 13.0, *) {
+            textRequest.recognitionLevel = .accurate
+            textRequest.usesLanguageCorrection = false
+            textRequest.regionOfInterest = regionOfInterest
+        } else {
+            // Fallback on earlier versions
+        }
+        
         var handler: VNImageRequestHandler?
         if let pixelBuffer = pixelBuffer {
             handler = VNImageRequestHandler(
                 cvPixelBuffer: pixelBuffer, orientation: textOrientation, options: [:])
         }
-        do {
-            try handler?.perform([textRequest].compactMap { $0 })
-        } catch {
+        if #available(iOSApplicationExtension 13.0, *) {
+            do {
+                try handler?.perform([textRequest].compactMap { $0 })
+            } catch {
+            }
+        } else {
+            // Fallback on earlier versions
         }
     }
 
     func processVNRequest(_ request: VNRequest) {
-        var allNumbers: [String] = []
-        for observation in request.results ?? [] {
-            guard let observation = observation as? VNRecognizedTextObservation else {
-                continue
-            }
-            let candidates = observation.topCandidates(5)
-            let topCandidate = candidates.first?.string
-            if STPCardValidator.sanitizedNumericString(for: topCandidate ?? "").count >= 4 {
-                allNumbers.append(topCandidate ?? "")
-            }
-            for recognizedText in candidates {
-                let possibleNumber = STPCardValidator.sanitizedNumericString(
-                    for: recognizedText.string)
-                if possibleNumber.count < 4 {
-                    continue  // This probably isn't something we're interested in, so don't bother processing it.
+        if #available(iOSApplicationExtension 13.0, *) {
+            var allNumbers: [String] = []
+            for observation in request.results ?? [] {
+                guard let observation = observation as? VNRecognizedTextObservation else {
+                    continue
                 }
-
-                // First strategy: We check if Vision sent us a number in a group on its own. If that fails, we'll try
-                // to catch it later when we iterate over all the numbers.
-                if STPCardValidator.validationState(
-                    forNumber: possibleNumber, validatingCardBrand: true)
-                    == .valid
-                {
-                    addDetectedNumber(possibleNumber)
-                } else if possibleNumber.count >= 4 && possibleNumber.count <= 6
-                    && STPStringUtils.stringMayContainExpirationDate(recognizedText.string)
-                {
-                    // Try to parse anything that looks like an expiration date.
-                    let expirationString = STPStringUtils.expirationDateString(
-                        from: recognizedText.string)
-                    let sanitizedExpiration = STPCardValidator.sanitizedNumericString(
-                        for: expirationString ?? "")
-                    let month = (sanitizedExpiration as NSString).substring(to: 2)
-                    let year = (sanitizedExpiration as NSString).substring(from: 2)
-
-                    // Ignore expiration dates 10+ years in the future, as they're likely to be incorrect recognitions
-                    let calendar = Calendar(identifier: .gregorian)
-                    let presentYear = calendar.component(.year, from: Date())
-                    let maxYear = (presentYear % 100) + 10
-
-                    if STPCardValidator.validationState(forExpirationYear: year, inMonth: month)
+                let candidates = observation.topCandidates(5)
+                let topCandidate = candidates.first?.string
+                if STPCardValidator.sanitizedNumericString(for: topCandidate ?? "").count >= 4 {
+                    allNumbers.append(topCandidate ?? "")
+                }
+                for recognizedText in candidates {
+                    let possibleNumber = STPCardValidator.sanitizedNumericString(
+                        for: recognizedText.string)
+                    if possibleNumber.count < 4 {
+                        continue  // This probably isn't something we're interested in, so don't bother processing it.
+                    }
+                    
+                    // First strategy: We check if Vision sent us a number in a group on its own. If that fails, we'll try
+                    // to catch it later when we iterate over all the numbers.
+                    if STPCardValidator.validationState(
+                        forNumber: possibleNumber, validatingCardBrand: true)
                         == .valid
-                        && Int(year) ?? 0 < maxYear
                     {
-                        addDetectedExpiration(sanitizedExpiration)
+                        addDetectedNumber(possibleNumber)
+                    } else if possibleNumber.count >= 4 && possibleNumber.count <= 6
+                                && STPStringUtils.stringMayContainExpirationDate(recognizedText.string)
+                    {
+                        // Try to parse anything that looks like an expiration date.
+                        let expirationString = STPStringUtils.expirationDateString(
+                            from: recognizedText.string)
+                        let sanitizedExpiration = STPCardValidator.sanitizedNumericString(
+                            for: expirationString ?? "")
+                        let month = (sanitizedExpiration as NSString).substring(to: 2)
+                        let year = (sanitizedExpiration as NSString).substring(from: 2)
+                        
+                        // Ignore expiration dates 10+ years in the future, as they're likely to be incorrect recognitions
+                        let calendar = Calendar(identifier: .gregorian)
+                        let presentYear = calendar.component(.year, from: Date())
+                        let maxYear = (presentYear % 100) + 10
+                        
+                        if STPCardValidator.validationState(forExpirationYear: year, inMonth: month)
+                            == .valid
+                            && Int(year) ?? 0 < maxYear
+                        {
+                            addDetectedExpiration(sanitizedExpiration)
+                        }
                     }
                 }
             }
-        }
-        // Second strategy: We look for consecutive groups of 4/4/4/4 or 4/6/5
-        // Vision is sending us groups like ["1234 565", "1234 1"], so we'll normalize these into groups with spaces:
-        let allGroups = allNumbers.joined(separator: " ").components(separatedBy: " ")
-        if allGroups.count < 3 {
-            return
-        }
-        for i in 0..<(allGroups.count - 3) {
-            let string1 = allGroups[i]
-            let string2 = allGroups[i + 1]
-            let string3 = allGroups[i + 2]
-            var string4 = ""
-            if i + 3 < allGroups.count {
-                string4 = allGroups[i + 3]
+            // Second strategy: We look for consecutive groups of 4/4/4/4 or 4/6/5
+            // Vision is sending us groups like ["1234 565", "1234 1"], so we'll normalize these into groups with spaces:
+            let allGroups = allNumbers.joined(separator: " ").components(separatedBy: " ")
+            if allGroups.count < 3 {
+                return
             }
-            // Then we'll go through each group and build a potential match:
-            let potentialCardString = "\(string1)\(string2)\(string3)\(string4)"
-            let potentialAmexString = "\(string1)\(string2)\(string3)"
-
-            // Then we'll add valid matches. It's okay if we add a number a second time after doing so above, as the success of that first pass means it's more likely to be a good match.
-            if STPCardValidator.validationState(
-                forNumber: potentialCardString, validatingCardBrand: true)
-                == .valid
-            {
-                addDetectedNumber(potentialCardString)
-            } else if STPCardValidator.validationState(
-                forNumber: potentialAmexString, validatingCardBrand: true) == .valid
-            {
-                addDetectedNumber(potentialAmexString)
+            for i in 0..<(allGroups.count - 3) {
+                let string1 = allGroups[i]
+                let string2 = allGroups[i + 1]
+                let string3 = allGroups[i + 2]
+                var string4 = ""
+                if i + 3 < allGroups.count {
+                    string4 = allGroups[i + 3]
+                }
+                // Then we'll go through each group and build a potential match:
+                let potentialCardString = "\(string1)\(string2)\(string3)\(string4)"
+                let potentialAmexString = "\(string1)\(string2)\(string3)"
+                
+                // Then we'll add valid matches. It's okay if we add a number a second time after doing so above, as the success of that first pass means it's more likely to be a good match.
+                if STPCardValidator.validationState(
+                    forNumber: potentialCardString, validatingCardBrand: true)
+                    == .valid
+                {
+                    addDetectedNumber(potentialCardString)
+                } else if STPCardValidator.validationState(
+                    forNumber: potentialAmexString, validatingCardBrand: true) == .valid
+                {
+                    addDetectedNumber(potentialAmexString)
+                }
             }
+        } else {
+            // Fallback on earlier versions
         }
     }
 
