@@ -73,7 +73,7 @@ class CardScanningView: UIView, STPCardScannerDelegate {
     }()
 
     private lazy var blurEffect: UIBlurEffect = {
-        if #available(iOSApplicationExtension 13.0, *) {
+        if #available(iOS 13.0, *) {
             return UIBlurEffect(style: .systemUltraThinMaterialDark)
         } else {
             return UIBlurEffect(style: .dark)

@@ -96,7 +96,7 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         if isScanning {
             return
         }
-        if #available(iOSApplicationExtension 13, *) {
+        if #available(iOS 13.0, *) {
             STPAnalyticsClient.sharedClient.addClass(toProductUsageIfNecessary: STPCardScanner.self)
         } else {
             // Fallback on earlier versions
@@ -270,7 +270,7 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         if pixelBuffer == nil {
             return
         }
-        if #available(iOSApplicationExtension 13.0, *) {
+        if #available(iOS 13.0, *) {
             textRequest.recognitionLevel = .accurate
             textRequest.usesLanguageCorrection = false
             textRequest.regionOfInterest = regionOfInterest
@@ -283,7 +283,7 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
             handler = VNImageRequestHandler(
                 cvPixelBuffer: pixelBuffer, orientation: textOrientation, options: [:])
         }
-        if #available(iOSApplicationExtension 13.0, *) {
+        if #available(iOS 13.0, *) {
             do {
                 try handler?.perform([textRequest].compactMap { $0 })
             } catch {
@@ -294,7 +294,7 @@ class STPCardScanner: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     func processVNRequest(_ request: VNRequest) {
-        if #available(iOSApplicationExtension 13.0, *) {
+        if #available(iOS 13.0, *) {
             var allNumbers: [String] = []
             for observation in request.results ?? [] {
                 guard let observation = observation as? VNRecognizedTextObservation else {
