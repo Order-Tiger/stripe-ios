@@ -14,30 +14,27 @@ typealias SectionViewModel = SectionElement.ViewModel
 /// For internal SDK use only
 @objc(STP_Internal_SectionView)
 final class SectionView: UIView {
-    
+
     // MARK: - Views
-    
-    lazy var errorLabel: UILabel = {
-        let error = ElementsUI.makeErrorLabel()
-        return error
+
+    lazy var errorOrSubLabel: UILabel = {
+        return ElementsUI.makeErrorLabel(theme: viewModel.theme)
     }()
     let containerView: SectionContainerView
-
     lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = ElementsUI.sectionTitleFont
-        label.textColor = CompatibleColor.secondaryLabel
-        label.accessibilityTraits = [.header]
-        return label
+        return ElementsUI.makeSectionTitleLabel(theme: viewModel.theme)
     }()
-    
+
+    let viewModel: SectionViewModel
+
     // MARK: - Initializers
-    
+
     init(viewModel: SectionViewModel) {
-        self.containerView = SectionContainerView(views: viewModel.views)
+        self.viewModel = viewModel
+        self.containerView = SectionContainerView(views: viewModel.views, theme: viewModel.theme)
         super.init(frame: .zero)
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, containerView, errorLabel])
+        let stack = UIStackView(arrangedSubviews: [titleLabel, containerView, errorOrSubLabel])
         stack.axis = .vertical
         stack.spacing = 4
         addAndPinSubview(stack)
@@ -48,7 +45,7 @@ final class SectionView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Private methods
 
     func update(with viewModel: SectionViewModel) {
@@ -59,15 +56,17 @@ final class SectionView: UIView {
         containerView.updateUI(newViews: viewModel.views)
         titleLabel.text = viewModel.title
         titleLabel.isHidden = viewModel.title == nil
-        if let error = viewModel.error, !error.isEmpty {
-            errorLabel.text = viewModel.error
-            errorLabel.isHidden = false
+        if let errorText = viewModel.errorText, !errorText.isEmpty {
+            errorOrSubLabel.text = viewModel.errorText
+            errorOrSubLabel.isHidden = false
+            errorOrSubLabel.textColor = viewModel.theme.colors.danger
+        } else if let subLabel = viewModel.subLabel {
+            errorOrSubLabel.text = subLabel
+            errorOrSubLabel.isHidden = false
+            errorOrSubLabel.textColor = viewModel.theme.colors.secondaryText
         } else {
-            errorLabel.text = nil
-            errorLabel.isHidden = true
+            errorOrSubLabel.text = nil
+            errorOrSubLabel.isHidden = true
         }
-        
     }
 }
-
-

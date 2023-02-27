@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Alternativ, puteți încărca manual o fotografie a documentului dvs. de identitate.";
+
 "App Settings" = "Setările aplicației";
 
-/* Description of back of driver's license image */
-"Back of driver's license" = "Partea posterioară a permisului de conducere";
+"Back driver's license photo successfully uploaded" = "Fotografia verso-ului permisului de conducere a fost încărcată cu succes";
 
-/* Description of back of identity card image */
-"Back of identity card" = "Partea posterioară a cărții de identitate";
+"Back identity card photo successfully uploaded" = "Fotografia verso-ului cărții de identitate a fost încărcată cu succes";
 
-/* Title displayed when requesting camera permissions */
+"Back of driver's license" = "Verso-ul permisului de conducere";
+
+"Back of identity card" = "Verso-ul cărții de identitate";
+
 "Camera permission" = "Permisiune cameră";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Cameră indisponibilă";
+
+"Capturing…" = "Se captează…";
+
 "Choose File" = "Selectare fișier";
 
-/* Label for Date of birth field */
+"Consent" = "Consimțământ";
+
+"Could not capture image" = "Nu s-a putut capta imaginea";
+
 "Date of birth" = "Data nașterii";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Permis de conducere";
+"File Upload" = "Încărcare fișier";
 
-/* Title of identity document file upload screen */
 "File upload" = "Încărcare fișier";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Întoarceți permisul de conducere pe partea cealaltă";
+
+"Flip your identity card over to the other side" = "Întoarceți cartea de identitate pe partea cealaltă";
+
+"Front driver's license photo successfully uploaded" = "Fotografia părții frontale a permisului de conducere a fost încărcată cu succes";
+
+"Front identity card photo successfully uploaded" = "Fotografia părții frontale a cărții de identitate a fost încărcată cu succes";
+
 "Front of driver's license" = "Partea frontală a permisului de conducere";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Partea frontală a cărții de identitate";
 
-/* Label for ID number section */
+"Go Back" = "Înapoi";
+
+"Hold still, scanning" = "Nu mișcați, se scanează";
+
 "ID Number" = "Număr de identificare";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Carte de identitate";
+"ID Type" = "Tip identificare";
 
-/* Description of passport image */
 "Image of passport" = "Imaginea pașaportului";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Se încarcă";
+
 "Passport" = "Pașaport";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Fotografia pașaportului a fost încărcată cu succes";
+
 "Personal ID number" = "Număr de identificare personal";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Galerie foto";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Vă rugăm să încărcați o imagine a pașaportului dvs.";
 
-/* Instructions for uploading images of drivers license */
-"Please upload images of the front and back of your driver's license" = "Vă rugăm să încărcați imagini cu partea frontală și posterioară ale permisului dvs. de conducere";
+"Please upload images of the front and back of your driver's license" = "Vă rugăm să încărcați imagini cu partea frontală și verso-ul permisului dvs. de conducere";
 
-/* Instructions for uploading images of identity card */
-"Please upload images of the front and back of your identity card" = "Vă rugăm să încărcați imagini cu partea frontală și posterioară ale documentului dvs. de identitate";
+"Please upload images of the front and back of your identity card" = "Vă rugăm să încărcați imagini cu partea frontală și verso-ul cărții dvs. de identitate";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Poziționați-vă permisul de conducere în centrul cadrului";
+
+"Position your face in the center of the frame." = "Poziționați-vă fața în centrul cadrului.";
+
+"Position your identity card in the center of the frame" = "Poziționați-vă cartea de identitate în centrul cadrului";
+
+"Position your passport in the center of the frame" = "Poziționați-vă pașaportul în centrul cadrului";
+
+"Scan" = "Scanare";
+
+"Scanned" = "Scanat";
+
 "Select" = "Selectare";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
-"Select a location to upload the back of your identity document from" = "Selectați o locație din care să încărcați partea posterioară a documentului dvs. de identitate";
+"Select a location to upload the back of your identity document from" = "Selectați o locație din care să încărcați verso-ului documentului dvs. de identitate";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Selectați o locație din care să încărcați partea frontală a documentului dvs. de identitate";
 
-/* When selected in an action sheet, opens the device's camera interface */
-"Take Photo" = "Efectuați o fotografie";
+"Select back driver's license photo" = "Selectați fotografia verso-ului permisului de conducere";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Încercați din nou";
+"Select back identity card photo" = "Selectați fotografia verso-ului cărții de identitate";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"Select front driver's license photo" = "Selectați fotografia părții frontale a permisului de conducere";
+
+"Select front identity card photo" = "Selectați fotografia părții frontale a cărții de identitate";
+
+"Select passport photo" = "Selectați fotografia pașaportului";
+
+"Selfie" = "Selfie";
+
+"Selfie captures" = "Capturi de tip selfie";
+
+"Selfie captures are complete" = "Capturile de tip selfie sunt complete";
+
+"Take Photo" = "Faceți o fotografie";
+
+"The images of your identity document have not been saved. Do you want to leave?" = "Imaginile documentului dvs. de identitate nu au fost salvate. Doriți să ieșiți?";
+
+"There was an error accessing the camera." = "A apărut o eroare la accesarea camerei.";
+
+"Try Again" = "Încercați din nou";
+
 "Unable to establish a connection." = "Nu s-a putut stabili o conexiune.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Modificări nesalvate";
+
 "Upload" = "Încărcare";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Încărcați o fotografie";
+
+"Uploading back driver's license photo" = "Se încarcă fotografia verso-ului permisului de conducere";
+
+"Uploading back identity card photo" = "Se încarcă fotografia verso-ului cărții de identitate";
+
+"Uploading front driver's license photo" = "Se încarcă fotografia părții frontale a permisului de conducere";
+
+"Uploading front identity card photo" = "Se încarcă fotografia părții frontale a cărții de identitate";
+
+"Uploading passport photo" = "Se încarcă fotografia pașaportului";
+
 "Verify your identity" = "Verificați-vă identitatea";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Nu am putut captura o imagine de înaltă calitate.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Avem nevoie de permisiunea de a utiliza camera dvs. Vă rugăm să permiteți accesul la cameră în setările aplicației.";
 
+"You can either try again or upload an image from your device." = "Puteți să încercați din nou sau să încărcați o imagine de pe dispozitivul dvs.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Fotografiile dvs. de tip selfie nu au fost salvate. Doriți să ieșiți?";

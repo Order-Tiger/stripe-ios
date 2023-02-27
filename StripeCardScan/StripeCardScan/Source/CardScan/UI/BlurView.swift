@@ -8,11 +8,15 @@
 import UIKit
 
 class BlurView: UIView {
-    required init?(coder aDecoder: NSCoder) {
+    required init?(
+        coder aDecoder: NSCoder
+    ) {
         super.init(coder: aDecoder)
     }
 
-    override init(frame: CGRect) {
+    override init(
+        frame: CGRect
+    ) {
         super.init(frame: frame)
     }
 
@@ -21,16 +25,15 @@ class BlurView: UIView {
         let path = CGMutablePath()
         let roiCornerRadius = roi.layer.cornerRadius
         let roiFrame = roi.layer.frame
-        let roundedRectpath = UIBezierPath.init(roundedRect: roiFrame, cornerRadius: roiCornerRadius).cgPath
+        let roundedRectpath = UIBezierPath.init(
+            roundedRect: roiFrame,
+            cornerRadius: roiCornerRadius
+        ).cgPath
 
         path.addRect(self.layer.bounds)
         path.addPath(roundedRectpath)
         maskLayer.path = path
-        #if swift(>=4.2)
-            maskLayer.fillRule = .evenOdd
-        #else
-            maskLayer.fillRule = kCAFillRuleEvenOdd
-        #endif
+        maskLayer.fillRule = .evenOdd
         self.layer.mask = maskLayer
     }
 

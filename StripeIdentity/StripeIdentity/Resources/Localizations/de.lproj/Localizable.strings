@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Alternativ können Sie manuell ein Foto Ihres Ausweisdokuments hochladen.";
+
 "App Settings" = "App-Einstellungen";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "Das Foto der Rückseite des Führerscheins wurde erfolgreich hochgeladen.";
+
+"Back identity card photo successfully uploaded" = "Das Foto der Rückseite des Ausweisdokuments wurde erfolgreich hochgeladen.";
+
 "Back of driver's license" = "Rückseite des Führerscheins";
 
-/* Description of back of identity card image */
 "Back of identity card" = "Rückseite des Personalausweises";
 
-/* Title displayed when requesting camera permissions */
 "Camera permission" = "Kameraberechtigung";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Kamera nicht verfügbar";
+
+"Capturing…" = "Aufnahme läuft ...";
+
 "Choose File" = "Datei auswählen";
 
-/* Label for Date of birth field */
+"Consent" = "Zustimmen";
+
+"Could not capture image" = "Aufnahme nicht möglich";
+
 "Date of birth" = "Geburtsdatum";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Führerschein";
+"File Upload" = "Datei hochladen";
 
-/* Title of identity document file upload screen */
 "File upload" = "Datei-Upload";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Drehen Sie Ihren Führerschein um";
+
+"Flip your identity card over to the other side" = "Drehen Sie Ihr Ausweisdokument um";
+
+"Front driver's license photo successfully uploaded" = "Das Foto der Vorderseite des Führerscheins wurde erfolgreich hochgeladen.";
+
+"Front identity card photo successfully uploaded" = "Das Foto der Vorderseite des Ausweisdokuments wurde erfolgreich hochgeladen.";
+
 "Front of driver's license" = "Vorderseite des Führerscheins";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Vorderseite des Personalausweises";
 
-/* Label for ID number section */
+"Go Back" = "Zurück";
+
+"Hold still, scanning" = "Bitte nicht bewegen, Scanvorgang läuft";
+
 "ID Number" = "Ausweisnummer";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Personalausweis";
+"ID Type" = "Art des Ausweisdokuments";
 
-/* Description of passport image */
 "Image of passport" = "Bild des Reisepasses";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Wird geladen";
+
 "Passport" = "Reisepass";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Das Foto des Reisepasses wurde erfolgreich hochgeladen.";
+
 "Personal ID number" = "Personalausweisnummer";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Fotobibliothek";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Bitte laden Sie ein Bild Ihres Reisepasses hoch";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Bitte laden Sie Bilder der Vorder- und Rückseite Ihres Führerscheins hoch";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Bitte laden Sie Bilder der Vorder- und Rückseite Ihres Personalausweises hoch";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Platzieren Sie Ihren Führerschein genau in der Mitte des Rahmens.";
+
+"Position your face in the center of the frame." = "Platzieren Sie Ihr Gesicht genau in der Mitte des Rahmens.";
+
+"Position your identity card in the center of the frame" = "Platzieren Sie Ihr Ausweisdokument genau in der Mitte des Rahmens.";
+
+"Position your passport in the center of the frame" = "Platzieren Sie Ihren Reisepass genau in der Mitte des Rahmens.";
+
+"Scan" = "Scannen";
+
+"Scanned" = "Eingescannt";
+
 "Select" = "Auswählen";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Wählen Sie einen Ort zum Hochladen der Rückseite Ihres Ausweisdokuments aus";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Wählen Sie einen Ort zum Hochladen der Vorderseite Ihres Ausweisdokuments aus";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Foto der Rückseite des Führerscheins auswählen";
+
+"Select back identity card photo" = "Foto der Rückseite des Ausweisdokuments auswählen";
+
+"Select front driver's license photo" = "Foto der Vorderseite des Führerscheins auswählen";
+
+"Select front identity card photo" = "Foto der Vorderseite des Ausweisdokuments auswählen";
+
+"Select passport photo" = "Foto des Reisepasses auswählen";
+
+"Selfie" = "Selfie";
+
+"Selfie captures" = "Selfie-Aufnahmen";
+
+"Selfie captures are complete" = "Die Selfie-Aufnahmen sind abgeschlossen.";
+
 "Take Photo" = "Aufnahme machen";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Erneut versuchen";
+"The images of your identity document have not been saved. Do you want to leave?" = "Die Bilder Ihres Ausweisdokuments wurden nicht gespeichert. Möchten Sie die Seite verlassen?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "Beim Zugriff auf die Kamera ist ein Fehler aufgetreten.";
+
+"Try Again" = "Erneut versuchen";
+
 "Unable to establish a connection." = "Es kann keine Verbindung hergestellt werden.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Nicht gespeicherte Änderungen";
+
 "Upload" = "Hochladen";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Foto hochladen";
+
+"Uploading back driver's license photo" = "Foto der Rückseite des Führerscheins wird hochgeladen";
+
+"Uploading back identity card photo" = "Foto der Rückseite des Ausweisdokuments wird hochgeladen";
+
+"Uploading front driver's license photo" = "Foto der Vorderseite des Führerscheins wird hochgeladen";
+
+"Uploading front identity card photo" = "Foto der Vorderseite des Ausweisdokuments wird hochgeladen";
+
+"Uploading passport photo" = "Foto des Reisepasses wird hochgeladen";
+
 "Verify your identity" = "Identität verifizieren";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Wir konnten kein qualitativ hochwertiges Bild aufnehmen.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Wir benötigen die Erlaubnis, Ihre Kamera zu verwenden. Bitte gewähren Sie den Kamerazugriff in den App-Einstellungen.";
 
+"You can either try again or upload an image from your device." = "Sie können es noch einmal versuchen oder ein Bild von Ihrem Endgerät hochladen.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Ihre Selfie-Aufnahmen wurden nicht gespeichert. Möchten Sie die Seite verlassen?";

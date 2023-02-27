@@ -3,12 +3,13 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 10/28/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
 import SafariServices
 @_spi(STP) import StripeCore
 @_spi(STP) import StripeUICore
+import UIKit
 
 class IdentityFlowViewController: UIViewController {
     private(set) weak var sheetController: VerificationSheetControllerProtocol?
@@ -16,6 +17,8 @@ class IdentityFlowViewController: UIViewController {
     private let flowView = IdentityFlowView()
 
     private var navBarBackgroundColor: UIColor?
+
+    let analyticsScreenName: IdentityAnalyticsClient.ScreenName
 
     // MARK: Overridable Properties
 
@@ -28,9 +31,11 @@ class IdentityFlowViewController: UIViewController {
 
     init(
         sheetController: VerificationSheetControllerProtocol,
+        analyticsScreenName: IdentityAnalyticsClient.ScreenName,
         shouldShowCancelButton: Bool = true
     ) {
         self.sheetController = sheetController
+        self.analyticsScreenName = analyticsScreenName
         super.init(nibName: nil, bundle: nil)
 
         if shouldShowCancelButton {
@@ -43,7 +48,9 @@ class IdentityFlowViewController: UIViewController {
         }
     }
 
-    required init?(coder: NSCoder) {
+    required init?(
+        coder: NSCoder
+    ) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -68,8 +75,22 @@ class IdentityFlowViewController: UIViewController {
         navigationController?.setNavigationBarBackgroundColor(with: navBarBackgroundColor)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard let sheetController = sheetController else {
+            return
+        }
+        sheetController.analyticsClient.stopTrackingTimeToScreenAndLogIfNeeded(
+            to: analyticsScreenName
+        )
+        sheetController.analyticsClient.logScreenAppeared(
+            screenName: analyticsScreenName,
+            sheetController: sheetController
+        )
+    }
+
     // MARK: Configure
-    
+
     func configure(
         backButtonTitle: String?,
         viewModel: IdentityFlowView.ViewModel
@@ -82,8 +103,16 @@ class IdentityFlowViewController: UIViewController {
             navigationController?.setNavigationBarBackgroundColor(with: navBarBackgroundColor)
         }
     }
+}
 
+@available(iOSApplicationExtension, unavailable)
+extension IdentityFlowViewController {
     func openInSafariViewController(url: URL) {
+        guard url.scheme == "http" || url.scheme == "https" else {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            return
+        }
+
         let safariVC = SFSafariViewController(url: url)
         safariVC.modalPresentationStyle = .popover
         present(safariVC, animated: true, completion: nil)
@@ -92,22 +121,38 @@ class IdentityFlowViewController: UIViewController {
 
 // MARK: - Private Helpers
 
-private extension IdentityFlowViewController {
-    func observeNotifications() {
+extension IdentityFlowViewController {
+    fileprivate func observeNotifications() {
         // Get keyboard notifications
         let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self, selector: #selector(keyboardWillChange), name: UIResponder.keyboardWillHideNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(keyboardWillChange), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(keyboardWillChange),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(keyboardWillChange),
+            name: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil
+        )
     }
 
-    @objc func keyboardWillChange(notification: Notification) {
-        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
+    @objc fileprivate func keyboardWillChange(notification: Notification) {
+        guard
+            let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey]
+                as? NSValue
+        else {
             return
         }
-        flowView.adjustScrollViewForKeyboard(keyboardValue.cgRectValue, isKeyboardHidden: notification.name == UIResponder.keyboardWillHideNotification)
+        flowView.adjustScrollViewForKeyboard(
+            keyboardValue.cgRectValue,
+            isKeyboardHidden: notification.name == UIResponder.keyboardWillHideNotification
+        )
     }
 
-    @objc func didTapCancelButton() {
+    @objc fileprivate func didTapCancelButton() {
         dismiss(animated: true, completion: nil)
     }
 }

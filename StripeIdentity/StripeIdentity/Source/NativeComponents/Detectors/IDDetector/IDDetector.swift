@@ -3,44 +3,29 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 1/27/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
-import Foundation
 import CoreVideo
-import Vision
+import Foundation
 @_spi(STP) import StripeCameraCore
 @_spi(STP) import StripeCore
+import Vision
 
-/**
- Scans an image using the IDDetector ML model.
- */
-@available(iOS 13, *)
+/// Scans an image using the IDDetector ML model.
+
 final class IDDetector: VisionBasedDetector {
     typealias Output = IDDetectorOutput?
-
-    struct Configuration {
-        /**
-         Minimum score threshold used when performing non-maximum suppression
-         on the model's output
-         */
-        let minScore: Float
-
-        /**
-         Minimum IOU threshold used when performing non-maximum suppression on
-         the model's output
-         */
-        let minIOU: Float
-    }
+    typealias Configuration = MLDetectorConfiguration
 
     let model: VNCoreMLModel
     let configuration: Configuration
+    let metricsTracker: MLDetectorMetricsTracker? = .init(modelName: "id_detector_v2")
 
-    /**
-     Initializes an `IDDetector`
-     - Parameters:
-       - model: The IDDetector ML model loaded into a `VNCoreMLModel`
-       - configuration: The configuration for this detector
-     */
+    /// Initializes an `IDDetector`
+    /// - Parameters:
+    ///   - model: The IDDetector ML model loaded into a `VNCoreMLModel`
+    ///   - configuration: The configuration for this detector
     init(
         model: VNCoreMLModel,
         configuration: Configuration

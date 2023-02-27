@@ -9,11 +9,12 @@
 #import "WeChatPayExampleViewController.h"
 
 @import Stripe;
+@import StripeCore;
 
 #import "BrowseExamplesViewController.h"
 
 /**
- Note: WeChat Pay is in private beta. For participating users, see https://stripe.com/docs/sources/wechat-pay/ios
+ Note: WeChat Pay is in private beta
  
  WeChat Pay is not currently supported by PaymentMethods, so integration requires the use of Sources.
  ref. https://stripe.com/docs/payments/payment-methods#transitioning
@@ -58,7 +59,7 @@ static NSString *const StripeExampleWeChatAppID = @"wxa0df51ec63e578ce";
     [self.view addSubview:label];
     self.waitingLabel = label;
     
-    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
     activityIndicator.hidesWhenStopped = YES;
     self.activityIndicator = activityIndicator;
     [self.view addSubview:activityIndicator];

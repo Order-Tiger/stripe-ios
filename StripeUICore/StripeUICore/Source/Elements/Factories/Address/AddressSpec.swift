@@ -12,7 +12,7 @@ import Foundation
 /**
  This represents the format of each country's dictionary in `localized_address_data.json`
  */
-struct AddressSpec: Codable {
+struct AddressSpec: Decodable {
     enum StateNameType: String, Codable {
         case area, county, department, do_si, emirate, island, oblast, parish, prefecture, state, province
         var localizedLabel: String {
@@ -30,7 +30,7 @@ struct AddressSpec: Codable {
             case .province: return String.Localized.province
             }
         }
-        
+
         init(from decoder: Decoder) throws {
             let state_name_type = try decoder.singleValueContainer().decode(String.self)
             self = StateNameType(rawValue: state_name_type) ?? .prefecture
@@ -46,13 +46,13 @@ struct AddressSpec: Codable {
             case .postal_code: return String.Localized.postal_code
             }
         }
-        
+
         init(from decoder: Decoder) throws {
             let zip_name_type = try decoder.singleValueContainer().decode(String.self)
             self = ZipNameType(rawValue: zip_name_type) ?? .postal_code
         }
     }
-    enum CityNameType: String, Codable {
+    enum LocalityNameType: String, Codable {
         case district, suburb, post_town, suburb_or_city, city
         var localizedLabel: String {
             switch self {
@@ -64,56 +64,84 @@ struct AddressSpec: Codable {
             }
         }
         init(from decoder: Decoder) throws {
-            let city_name_type = try decoder.singleValueContainer().decode(String.self)
-            self = CityNameType(rawValue: city_name_type) ?? .suburb_or_city
+            let locality_name_type = try decoder.singleValueContainer().decode(String.self)
+            self = LocalityNameType(rawValue: locality_name_type) ?? .suburb_or_city
         }
     }
-    
-    let format: String
-    let require: String
-    let cityNameType: CityNameType
+    /// An enum of the fields that `AddressSpec` describes.
+    enum FieldType: String {
+        /// Address lines 1 and 2
+        case line = "A"
+        case city = "C"
+        case state = "S"
+        case postal = "Z"
+    }
+
+    /// The order to display the fields.
+    let fieldOrdering: [FieldType]
+    let requiredFields: [FieldType]
+    let cityNameType: LocalityNameType
     let stateNameType: StateNameType
     let zip: String?
     let zipNameType: ZipNameType
-    
+    let subKeys: [String]? // e.g. state abbreviations - "CA"
+    let subLabels: [String]? // e.g. state display names - "California"
+
     enum CodingKeys: String, CodingKey {
         case format = "fmt"
         case require = "require"
-        case cityNameType = "city_name_type"
+        case localityNameType = "locality_name_type" // e.g. City
         case stateNameType = "state_name_type"
         case zip = "zip"
         case zipNameType = "zip_name_type"
+        case subKeys = "sub_keys"
+        case subLabels = "sub_labels"
     }
-    
+
     static var `default`: AddressSpec {
         return AddressSpec()
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.init(
             format: try? container.decode(String.self, forKey: .format),
             require: try? container.decode(String.self, forKey: .require),
-            cityNameType: try? container.decode(CityNameType.self, forKey: .cityNameType),
+            cityNameType: try? container.decode(LocalityNameType.self, forKey: .localityNameType),
             stateNameType: try? container.decode(StateNameType.self, forKey: .stateNameType),
             zip: try? container.decode(String.self, forKey: .zip),
-            zipNameType: try? container.decode(ZipNameType.self, forKey: .zipNameType)
+            zipNameType: try? container.decode(ZipNameType.self, forKey: .zipNameType),
+            subKeys: try? container.decode([String].self, forKey: .subKeys),
+            subLabels: try? container.decode([String].self, forKey: .subLabels)
         )
     }
-    
+
     init(
         format: String? = nil,
         require: String? = nil,
-        cityNameType: CityNameType? = nil,
+        cityNameType: LocalityNameType? = nil,
         stateNameType: StateNameType? = nil,
         zip: String? = nil,
-        zipNameType: ZipNameType? = nil
+        zipNameType: ZipNameType? = nil,
+        subKeys: [String]? = nil,
+        subLabels: [String]? = nil
     ) {
-        self.format = format ?? "NACSZ"
-        self.require = require ?? "ACSZ"
+        var fieldOrdering: [FieldType] = (format ?? "NACSZ").compactMap {
+           FieldType(rawValue: String($0))
+        }
+        // We always collect line1 and line2 ("A"), so prepend if it's missing
+        if !fieldOrdering.contains(FieldType.line) {
+            fieldOrdering = [.line] + fieldOrdering
+        }
+        self.fieldOrdering = fieldOrdering
+        self.requiredFields = (require ?? "ACSZ").compactMap {
+            FieldType(rawValue: String($0))
+        }
         self.cityNameType = cityNameType ?? .city
         self.stateNameType = stateNameType ?? .province
         self.zip = zip
         self.zipNameType = zipNameType ?? .postal_code
+        self.subKeys = subKeys
+        self.subLabels = subLabels
     }
 }

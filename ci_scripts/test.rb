@@ -100,10 +100,10 @@ end
 if skip_snapshot_tests
   skip_tests += [
     # Subset of tests that don't end with 'Snapshot(Test|Tests)'.
-    'StripeiOS Tests/STPAddCardViewControllerLocalizationTests',
-    'StripeiOS Tests/STPPaymentOptionsViewControllerLocalizationTests',
-    'StripeiOS Tests/STPShippingAddressViewControllerLocalizationTests',
-    'StripeiOS Tests/STPShippingMethodsViewControllerLocalizationTests'
+    'StripeiOSTests/STPAddCardViewControllerLocalizationTests',
+    'StripeiOSTests/STPPaymentOptionsViewControllerLocalizationTests',
+    'StripeiOSTests/STPShippingAddressViewControllerLocalizationTests',
+    'StripeiOSTests/STPShippingMethodsViewControllerLocalizationTests'
   ]
 
   skip_tests += discover_snapshot_tests()
@@ -148,13 +148,6 @@ retry_tests_command = ""
 retry_tests_command = "-retry-tests-on-failure -test-iterations 5" if retry_tests
 
 Dir.chdir(__dir__ + '/..') do
-  carthage_command = <<~HEREDOC
-    carthage bootstrap --platform iOS --configuration Release --no-use-binaries --cache-builds --use-xcframeworks
-  HEREDOC
-  puts carthage_command
-  system carthage_command
-  exit $?.exitstatus unless $?.success?
-
   xcodebuild_command = <<~HEREDOC
     xcodebuild #{build_action} \
     #{quiet_command} \

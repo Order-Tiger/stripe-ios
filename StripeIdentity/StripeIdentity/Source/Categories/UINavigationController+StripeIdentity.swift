@@ -3,18 +3,18 @@
 //  StripeIdentity
 //
 //  Created by Jaime Park on 2/10/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
 @_spi(STP) import StripeUICore
+import UIKit
 
 extension UINavigationController {
     func configureBorderlessNavigationBar() {
         if #available(iOS 13.0, *) {
             let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .clear
-            appearance.shadowColor = .clear
+            appearance.copyButtonAppearance(from: UINavigationBar.appearance().standardAppearance)
+            appearance.configureWithTransparentBackground()
 
             navigationBar.standardAppearance = appearance
             navigationBar.scrollEdgeAppearance = appearance
@@ -26,7 +26,7 @@ extension UINavigationController {
     }
 
     func setNavigationBarBackgroundColor(with backgroundColor: UIColor?) {
-        let bgColor = backgroundColor ?? CompatibleColor.systemBackground
+        let bgColor = backgroundColor ?? .systemBackground
 
         if #available(iOS 13.0, *) {
             navigationBar.standardAppearance.backgroundColor = bgColor
@@ -34,5 +34,39 @@ extension UINavigationController {
         } else {
             navigationBar.backgroundColor = bgColor
         }
+    }
+}
+
+@available(iOS 13.0, *)
+extension UINavigationBarAppearance {
+    fileprivate func copyButtonAppearance(from other: UINavigationBarAppearance) {
+        // Button appearances will be undefined if using the default configuration.
+        // Copying the default undefined configuration will result in an
+        // NSInternalInconsistencyException. We can check for undefined by
+        // copying the values to an optional type and checking for nil.
+        let otherButtonAppearance: UIBarButtonItemAppearance? = other.buttonAppearance
+        let otherDoneButtonAppearance: UIBarButtonItemAppearance? = other.doneButtonAppearance
+        let otherBackButtonAppearance: UIBarButtonItemAppearance? = other.backButtonAppearance
+
+        if let otherButtonAppearance = otherButtonAppearance {
+            buttonAppearance = otherButtonAppearance
+        } else {
+            buttonAppearance.configureWithDefault(for: .plain)
+        }
+        if let otherDoneButtonAppearance = otherDoneButtonAppearance {
+            doneButtonAppearance = otherDoneButtonAppearance
+        } else {
+            doneButtonAppearance.configureWithDefault(for: .done)
+        }
+        if let otherBackButtonAppearance = otherBackButtonAppearance {
+            backButtonAppearance = otherBackButtonAppearance
+        } else {
+            backButtonAppearance.configureWithDefault(for: .plain)
+        }
+
+        setBackIndicatorImage(
+            other.backIndicatorImage,
+            transitionMaskImage: other.backIndicatorTransitionMaskImage
+        )
     }
 }

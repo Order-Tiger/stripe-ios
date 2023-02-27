@@ -8,10 +8,12 @@
 import Foundation
 @_spi(STP) import StripeCore
 
+extension StripeAPI {
 
+    struct VerificationPageStaticContentDocumentCaptureModels: Decodable, Equatable {
+        let idDetectorMinIou: Decimal
+        let idDetectorMinScore: Decimal
+        let idDetectorUrl: String
+    }
 
-struct VerificationPageStaticContentDocumentCaptureModels: StripeDecodable, Equatable {
-    let idDetectorUrl: String
-    
-    var _allResponseFieldsStorage: NonEncodableParameters?
 }

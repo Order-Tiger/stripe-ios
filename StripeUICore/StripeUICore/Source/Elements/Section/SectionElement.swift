@@ -13,17 +13,29 @@ import UIKit
  A simple container element with an optional title and an error, and draws a border around its elements.
  Chooses which of its sub-elements' errors to display.
  */
-@_spi(STP) public class SectionElement {
-
+@_spi(STP) public final class SectionElement: ContainerElement {
     weak public var delegate: ElementDelegate?
     lazy var sectionView: SectionView = {
+        isViewInitialized = true
         return SectionView(viewModel: viewModel)
     }()
+    var isViewInitialized: Bool = false
+    var errorText: String? {
+        // Find the first element that's 1. invalid and 2. has a displayable error
+        for element in elements {
+            if case let .invalid(error, shouldDisplay) = element.validationState, shouldDisplay {
+                return error.localizedDescription
+            }
+        }
+        return nil
+    }
     var viewModel: SectionViewModel {
         return ViewModel(
             views: elements.map({ $0.view }),
             title: title,
-            error: error
+            errorText: errorText,
+            subLabel: subLabel,
+            theme: theme
         )
     }
     public var elements: [Element] {
@@ -31,49 +43,49 @@ import UIKit
             elements.forEach {
                 $0.delegate = self
             }
-            sectionView.update(with: viewModel)
+            if isViewInitialized {
+                sectionView.update(with: viewModel)
+            }
             delegate?.didUpdate(element: self)
         }
     }
     let title: String?
-    var error: String? {
-        // Display the error text of the first element with an error
-        elements.compactMap({ $0.errorText }).first
+
+    var subLabel: String? {
+        elements.compactMap({ $0.subLabelText }).first
     }
 
+    let theme: ElementsUITheme
+
     // MARK: - ViewModel
-    
+
     struct ViewModel {
         let views: [UIView]
         let title: String?
-        var error: String? = nil
+        let errorText: String?
+        var subLabel: String?
+        let theme: ElementsUITheme
     }
 
     // MARK: - Initializers
-    
-    public init(title: String? = nil, elements: [Element]) {
+
+    public init(title: String? = nil, elements: [Element], theme: ElementsUITheme = .default) {
         self.title = title
         self.elements = elements
-        
-        defer {
-            elements.forEach {
-                $0.delegate = self
-            }
+        self.theme = theme
+        elements.forEach {
+            $0.delegate = self
         }
     }
-    
-    public convenience init(_ element: Element) {
-        self.init(title: nil, elements: [element])
+
+    public convenience init(_ element: Element, theme: ElementsUITheme = .default) {
+        self.init(title: nil, elements: [element], theme: theme)
     }
 }
 
 // MARK: - Element
 
 extension SectionElement: Element {
-    public func becomeResponder() -> Bool {
-        return elements.first?.becomeResponder() ?? false
-    }
-    
     public var view: UIView {
         return sectionView
     }
@@ -82,21 +94,11 @@ extension SectionElement: Element {
 // MARK: - ElementDelegate
 
 extension SectionElement: ElementDelegate {
-    public func didFinishEditing(element: Element) {
-        let remainingElements = elements.drop { $0 !== element }.dropFirst()
-        for next in remainingElements {
-            if next.becomeResponder() {
-                UIAccessibility.post(notification: .screenChanged, argument: next.view)
-                return
-            }
-        }
-        // Failed to become first responder
-        delegate?.didFinishEditing(element: self)
-    }
-    
     public func didUpdate(element: Element) {
         // Glue: Update the view and our delegate
-        sectionView.update(with: viewModel)
+        if isViewInitialized {
+            sectionView.update(with: viewModel)
+        }
         delegate?.didUpdate(element: self)
     }
 }

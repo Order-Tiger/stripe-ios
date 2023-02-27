@@ -1,120 +1,119 @@
-/* The label of a text field that is optional. For example, 'Email (optional)' or 'Name (optional) */
 "%@ (optional)" = "%@ (nem kötelező)";
 
-/* Caption for Address field on address form */
+"Account number" = "Számlaszám";
+
 "Address" = "Cím";
 
-/* Address line 1 placeholder for billing address form. */
 "Address line 1" = "Cím 1. sora";
 
-/* Label for input requesting address line 2, used for international addresses */
 "Address line 2" = "2. címsor";
 
-/* Label of an address field in hk */
 "Area" = "Terület";
 
-/* Button title to cancel action in an alert */
+"BSB number" = "BSB-szám";
+
+"Billing address is same as shipping" = "A számlázási cím megegyezik a szállítási címmel";
+
 "Cancel" = "Mégse";
 
-/* Caption for City field on address form */
 "City" = "Város";
 
-/* Text for continue button */
+"Code field" = "Kódmező";
+
+"Company" = "Vállalat";
+
 "Continue" = "Folytatás";
 
-/* Caption for Country field on address form */
 "Country" = "Ország";
 
-/* Country selector and postal code entry form header title */
 "Country or region" = "Ország vagy régió";
 
-/* Caption for County field on address form (only countries that use county, like United Kingdom) */
 "County" = "Ország";
 
-/* Label of an address field */
 "Department" = "Megye";
 
-/* Label for the district field on an address form */
 "District" = "Kerület";
 
-/* Label of an address field */
 "Do Si" = "Do Si";
 
-/* Done button title */
 "Done" = "Kész";
 
-/* Label of an address field */
+"Double tap to edit" = "A szerkesztéshez koppintson kétszer";
+
+"Edit" = "Szerkesztés";
+
 "Eircode" = "Irányítószám";
 
-/* Caption for Email field on address form */
 "Email" = "E-mail";
 
-/* Used to describe address in United Arab Emirates */
 "Emirate" = "Emirátus";
 
-/* Label for first (given) name field */
+"Error" = "Hiba";
+
 "First" = "Utónév";
 
-/* Error description for incomplete phone number */
+"Full name" = "Teljes név";
+
 "Incomplete phone number" = "Hiányos telefonszám";
 
-/* Label of an address field */
+"Invalid UPI ID" = "Érvénytelen UPI-azonosító";
+
 "Island" = "Sziget";
 
-/* Label for last (family) name field */
 "Last" = "Vezetéknév";
 
-/* Form field header for entering a mobile phone number */
-"Mobile number" = "Mobiltelefonszám";
-
-/* Caption for Name field on address form */
 "Name" = "Név";
 
-/* No comment provided by engineer. */
+"Name on account" = "A számlán szereplő név";
+
 "OK" = "OK";
 
-/* Label of an address field */
 "Oblast" = "Terület";
 
-/* An option in a dropdown selector indicating the customer's desired selection is not in the list. e.g., 'Choose your bank: Bank1, Bank2, Other' */
 "Other" = "Egyéb";
 
-/* Label of an address field */
 "Parish" = "Egyházközség";
 
-/* Caption for Phone field on address form */
 "Phone" = "Telefon";
 
-/* Short string for postal code (text used in non-US countries) */
 "Postal code" = "Irányítószám";
 
-/* Label of an address field */
 "Prefecture" = "Prefektúra";
 
-/* Caption for Province field on address form (only countries that use province, like Canada) */
 "Province" = "Tartomány";
 
-/* Caption for State field on address form (only countries that use state , like United States) */
+"Remove" = "Eltávolítás";
+
+"Remove bank account" = "Bankszámla eltávolítása";
+
+"Remove bank account ending in %@" = "%@ számra végződő bankszámla eltávolítása";
+
+"Search" = "Keresés";
+
 "State" = "Állam";
 
-/* Label of an address field */
 "Suburb" = "Külváros";
 
-/* Label of an address field */
 "Suburb or city" = "Külváros vagy város";
 
-/* An error message. */
+"The BSB you entered is incomplete." = "A beírt BSB-szám hiányos.";
+
 "The ID number you entered is incomplete." = "A beírt azonosítószám hiányos.";
 
-/* Label of an address field */
+"The account number you entered is incomplete." = "A számlaszám hiányos.";
+
 "Town or city" = "Kisváros vagy város";
 
-/* Error string when we can't parse a phone number */
+"UPI ID" = "UPI-azonosító";
+
 "Unable to parse phone number" = "A telefonszám nem értelmezhető";
 
-/* Error message when email is invalid */
+"Use rotor to access links" = "Rotor használata a hivatkozások kezeléséhez";
+
+"Your ZIP is incomplete." = "A ZIP hiányos.";
+
 "Your email is invalid." = "Érvénytelen e-mail-cím.";
 
-/* Short string for zip code (United States only) Please keep to 5 characters or less if possible. */
-"ZIP" = "Irányítószám";
+"Your postal code is incomplete." = "Az irányítószám hiányos.";
 
+"ZIP" = "Irányítószám";

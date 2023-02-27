@@ -6,11 +6,20 @@
 //  Copyright © 2019 Stripe. All rights reserved.
 //
 
-@import FBSnapshotTestCase;
+@import iOSSnapshotTestCaseCore;
+
 #import <XCTest/XCTest.h>
 
 #import "STDSChallengeResponseViewController.h"
 #import "STDSChallengeResponseObject+TestObjects.h"
+
+/**
+ Calls FBSnapshotVerifyView with a default 2% per-pixel color differentiation, as M1 and Intel machines render shadows differently.
+ @param view The view to snapshot.
+ @param identifier An optional identifier, used if there are multiple snapshot tests in a given -test method.
+ */
+#define STPSnapshotVerifyView(view__, identifier__) \
+FBSnapshotVerifyViewWithPixelOptions(view__, identifier__, FBSnapshotTestCaseDefaultSuffixes(), 0.02, 0)
 
 @interface STDSChallengeResponseViewControllerSnapshotTests: FBSnapshotTestCase
 
@@ -21,8 +30,8 @@
 - (void)setUp {
     [super setUp];
     
-    /// Recorded on an iPhone XR running iOS 12.1
-    self.recordMode = NO;
+    /// Recorded on an iPhone 12 Mini running iOS 15.4
+//    self.recordMode = YES;
 }
 
 - (void)testVerifyTextChallengeDesign {
@@ -30,8 +39,8 @@
     [challengeResponseViewController view];
     
     [self waitForChallengeResponseTimer];
-    
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"TextChallengeResponse");
+
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"TextChallengeResponse");
 }
 
 - (void)testVerifySingleSelectDesign {
@@ -40,7 +49,7 @@
     
     [self waitForChallengeResponseTimer];
     
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"SingleSelectResponse");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"SingleSelectResponse");
 }
 
 - (void)testVerifyMultiSelectDesign {
@@ -49,7 +58,7 @@
     
     [self waitForChallengeResponseTimer];
     
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"MultiSelectResponse");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"MultiSelectResponse");
 }
 
 - (void)testVerifyOOBDesign {
@@ -58,7 +67,7 @@
     
     [self waitForChallengeResponseTimer];
     
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"OOBResponse");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"OOBResponse");
 }
 
 - (void)testLoadingAmex {
@@ -66,7 +75,7 @@
     [challengeResponseViewController view];
     [challengeResponseViewController setLoading];
 
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"LoadingAmex");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"LoadingAmex");
 }
 
 - (void)testLoadingDiscover {
@@ -74,7 +83,7 @@
     [challengeResponseViewController view];
     [challengeResponseViewController setLoading];
 
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"LoadingDiscover");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"LoadingDiscover");
 }
 
 - (void)testLoadingMastercard {
@@ -82,7 +91,7 @@
     [challengeResponseViewController view];
     [challengeResponseViewController setLoading];
 
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"LoadingMastercard");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"LoadingMastercard");
 }
 
 - (void)testLoadingVisa {
@@ -90,7 +99,7 @@
     [challengeResponseViewController view];
     [challengeResponseViewController setLoading];
 
-    FBSnapshotVerifyView(challengeResponseViewController.view, @"LoadingVisa");
+    STPSnapshotVerifyView(challengeResponseViewController.view, @"LoadingVisa");
 }
 
 - (STDSChallengeResponseViewController *)challengeResponseViewControllerForResponse:(id<STDSChallengeResponse>)response directoryServer:(STDSDirectoryServer)directoryServer {

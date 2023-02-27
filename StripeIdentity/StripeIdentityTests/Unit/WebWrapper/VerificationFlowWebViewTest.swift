@@ -10,6 +10,7 @@ import XCTest
 
 @testable import StripeIdentity
 
+@available(iOS 14.3, *)
 final class VerificationFlowWebViewTest: XCTestCase {
 
     private var verificationWebView: VerificationFlowWebView!
@@ -33,7 +34,7 @@ final class VerificationFlowWebViewTest: XCTestCase {
             return XCTFail("Could not load mock html file")
         }
         mockFileURL = url
-        
+
         verificationWebView = VerificationFlowWebView(initialURL: url)
         verificationWebView.delegate = self
     }
@@ -49,16 +50,17 @@ final class VerificationFlowWebViewTest: XCTestCase {
     }
 }
 
+@available(iOS 14.3, *)
 extension VerificationFlowWebViewTest: VerificationFlowWebViewDelegate {
     func verificationFlowWebView(_ view: VerificationFlowWebView, didChangeURL url: URL?) {
         urlFromDelegateCallback = url
     }
 
-    func verificationFlowWebViewDidClose(_ view: VerificationFlowWebView) { }
+    func verificationFlowWebViewDidClose(_ view: VerificationFlowWebView) {}
 
     func verificationFlowWebViewDidFinishLoading(_ view: VerificationFlowWebView) {
         didFinishLoadingExpectation.fulfill()
     }
 
-    func verificationFlowWebView(_ view: VerificationFlowWebView, didOpenURLInNewTarget url: URL) { }
+    func verificationFlowWebView(_ view: VerificationFlowWebView, didOpenURLInNewTarget url: URL) {}
 }

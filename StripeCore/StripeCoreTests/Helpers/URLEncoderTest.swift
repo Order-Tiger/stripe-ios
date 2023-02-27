@@ -6,23 +6,21 @@
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import XCTest
-
 @_spi(STP) import StripeCore
+import XCTest
 
 final class URLEncoderTest: XCTestCase {
     func testStringByReplacingSnakeCaseWithCamelCase() {
         let camelCase = URLEncoder.convertToCamelCase(snakeCase: "test_1_2_34_test")
         XCTAssertEqual("test1234Test", camelCase)
     }
-    
+
     func testStringByReplacingCamelCaseWithSnakeCase() {
         let snakeCase = URLEncoder.convertToSnakeCase(camelCase: "test1234Test")
         XCTAssertEqual("test1234_test", snakeCase)
         let snakeCase2 = URLEncoder.convertToSnakeCase(camelCase: "testUrlTest")
         XCTAssertEqual("test_url_test", snakeCase2)
     }
-
 
     func testQueryStringWithBadFields() {
         let params = [
@@ -39,7 +37,7 @@ final class URLEncoderTest: XCTestCase {
             [
                 "foo": "bar",
                 "baz": [
-                    "qux": NSNumber(value: 1)
+                    "qux": NSNumber(value: 1),
                 ],
             ] as [String: AnyHashable]
         let result = URLEncoder.queryString(from: params)
@@ -52,7 +50,7 @@ final class URLEncoderTest: XCTestCase {
                 "certificates": ["cert1", "cert2"],
                 "nonce": "123mynonce",
                 "nonce_signature": "sig",
-            ]
+            ],
         ]
         let result = URLEncoder.queryString(from: params)
         XCTAssertEqual(

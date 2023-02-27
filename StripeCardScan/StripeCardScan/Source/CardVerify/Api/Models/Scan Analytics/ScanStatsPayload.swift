@@ -9,48 +9,54 @@ import Foundation
 @_spi(STP) import StripeCore
 
 /// Parent payload structure for uploading scan stats
-struct ScanStatsPayload: StripeEncodable {
+struct ScanStatsPayload: Encodable {
     let clientSecret: String
     let payload: ScanAnalyticsPayload
-    var _additionalParametersStorage: NonEncodableParameters?
 }
 
-struct ScanAnalyticsPayload: StripeEncodable {
+struct ScanAnalyticsPayload: Encodable {
     let app = AppInfo()
+    let configuration: ConfigurationInfo
     let device = DeviceInfo()
     /// API  requirement but have no purpose
     let instanceId: String = UUID().uuidString
+    let payloadInfo: PayloadInfo?
     let payloadVersion = "2"
     /// API  requirement but have no purpose
     let scanId: String = UUID().uuidString
     let scanStats: ScanStatsTasks
-    var _additionalParametersStorage: NonEncodableParameters?
 }
 
-struct ScanStatsTasks: StripeEncodable {
+struct ScanStatsTasks: Encodable {
     let repeatingTasks: RepeatingTasks
     let tasks: NonRepeatingTasks
-    var _additionalParametersStorage: NonEncodableParameters?
 }
 
-struct NonRepeatingTasks: StripeEncodable {
+struct NonRepeatingTasks: Encodable {
     let cameraPermission: [ScanAnalyticsNonRepeatingTask]
+    let completionLoopDuration: [ScanAnalyticsNonRepeatingTask]
+    let imageCompressionDuration: [ScanAnalyticsNonRepeatingTask]
+    let mainLoopDuration: [ScanAnalyticsNonRepeatingTask]
     let scanActivity: [ScanAnalyticsNonRepeatingTask]
     let torchSupported: [ScanAnalyticsNonRepeatingTask]
 
     init(
         cameraPermissionTask: ScanAnalyticsNonRepeatingTask,
-        torchSupportedTask: ScanAnalyticsNonRepeatingTask,
-        scanActivityTasks: [ScanAnalyticsNonRepeatingTask]
+        completionLoopDuration: ScanAnalyticsNonRepeatingTask,
+        imageCompressionDuration: ScanAnalyticsNonRepeatingTask,
+        mainLoopDuration: ScanAnalyticsNonRepeatingTask,
+        scanActivityTasks: [ScanAnalyticsNonRepeatingTask],
+        torchSupportedTask: ScanAnalyticsNonRepeatingTask
     ) {
         self.cameraPermission = [cameraPermissionTask]
-        self.torchSupported = [torchSupportedTask]
+        self.completionLoopDuration = [completionLoopDuration]
+        self.imageCompressionDuration = [imageCompressionDuration]
+        self.mainLoopDuration = [mainLoopDuration]
         self.scanActivity = scanActivityTasks
+        self.torchSupported = [torchSupportedTask]
     }
-    var _additionalParametersStorage: NonEncodableParameters?
 }
 
-struct RepeatingTasks: StripeEncodable {
+struct RepeatingTasks: Encodable {
     let mainLoopImagesProcessed: ScanAnalyticsRepeatingTask
-    var _additionalParametersStorage: NonEncodableParameters?
 }

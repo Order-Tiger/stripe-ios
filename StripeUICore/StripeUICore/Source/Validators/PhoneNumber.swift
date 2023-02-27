@@ -3,6 +3,7 @@
 //  StripeUICore
 //
 //  Created by Cameron Sabol on 9/22/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import UIKit
@@ -17,49 +18,105 @@ import UIKit
         case national
         /// Formatted for display an an international number with country code, e.g. +1 (555) 555-5555
         case international
-        
+
         static let e164FormatMaxDigits = 15
     }
-    
+
     public func string(as format: Format) -> String {
         return metadata.formattedNumber(number, format: format)
     }
-    
+
     /// The country that matches this phone number, e.g. "US"
     public var countryCode: String {
         return metadata.regionCode
     }
-    
+
     /// The phone number prefix for the country of this phone number, e.g. "+1"
     public var prefix: String {
         return metadata.prefix
     }
-    
+
     /// Whether this represents a complete phone number
     public var isComplete: Bool {
         return string(as: .national).count >= metadata.pattern.count
     }
-    
-    private let number: String
+
+    /// The phone number without the country prefix and containing only digits
+    public let number: String
     private let metadata: Metadata
-    
+
     public init?(number: String, countryCode: String?) {
         guard let countryCode = countryCode,
               let metadata = Metadata.metadata(for: countryCode) else {
             return nil
         }
-              
+
         self.number = number
         self.metadata = metadata
+    }
+
+    init(number: String, metadata: Metadata) {
+        self.number = number
+        self.metadata = metadata
+    }
+
+    /// Parses phone numbers in (*globalized*) E.164 format.
+    ///
+    /// - Note: Our metadata lacks of national destination code (area code)  ranges, because of this we fallback to
+    ///         the device's locale to disambiguate when a number can possibly belong to multiple regions.
+    ///
+    /// - Parameters:
+    ///   - number: Phone number to parse.
+    ///   - locale: User's locale.
+    /// - Returns: `PhoneNumber`, or `nil` if the number is not parsable.
+    public static func fromE164(_ number: String, locale: Locale = .current) -> PhoneNumber? {
+        let characters: [Character] = .init(number)
+
+        // Matching regex: ^\+[1-9]\d{2,14}$
+        guard
+            characters.count > 4,
+            characters.count <= Format.e164FormatMaxDigits + 1,
+            characters[0] == "+",
+            characters[1] != "0",
+            characters[1...].allSatisfy({
+                $0.unicodeScalars.allSatisfy(CharacterSet.stp_asciiDigit.contains(_:))
+            })
+        else {
+            return nil
+        }
+
+        let makePhoneNumber: (Metadata) -> PhoneNumber = { metadata in
+            return PhoneNumber(
+                number: String(characters[metadata.prefix.count...]),
+                metadata: metadata
+            )
+        }
+
+        // This filter should narrow down the metadata list to just 1 candidate in most cases,
+        // as very few countries share country calling codes. Country calling codes are also
+        // *Prefix codes*, which means that two codes will never overlap.
+        let candidates = Metadata.allMetadata.filter({ number.hasPrefix($0.prefix) })
+        if candidates.count == 1 {
+            return candidates.first.flatMap(makePhoneNumber)
+        }
+
+        // This second filter uses the device's locale to pick a winner out of N candidates.
+        if let winner = candidates.first(where: { $0.regionCode == locale.regionCode }) {
+            return makePhoneNumber(winner)
+        }
+
+        // If no winner, we simply return the first candidate. Our metadata is sorted in a way that the
+        // main country of a prefix is always first.
+        return candidates.first.flatMap(makePhoneNumber)
     }
 
 }
 
 @_spi(STP) public extension PhoneNumber {
     struct Metadata: RegionCodeProvider {
-                
+
         private static var metadataByCountryCodeCache: [String: Metadata] = [:]
-        
+
         public static func metadata(for countryCode: String) -> Metadata? {
             if let cached = metadataByCountryCodeCache[countryCode] {
                 return cached
@@ -70,32 +127,32 @@ import UIKit
             }
             return nil
         }
-        
+
         public let prefix: String
         public let regionCode: String
         internal let pattern: String
-        
+
         public var sampleFilledPattern: String {
             let numDigitsInPattern = pattern.filter({ $0 == "#" }).count
             return formattedNumber(String(repeating: "5", count: numDigitsInPattern), format: .national)
         }
-        
+
         func formattedNumber(_ number: String, format: Format) -> String {
             guard let formatter = TextFieldFormatter(format: pattern) else {
                 return number
             }
-            
+
             let allowedCharacterSet: CharacterSet = CharacterSet.stp_asciiDigit.union(CharacterSet(charactersIn: String(TextFieldFormatter.redactedNumberCharacter))) // allow '•' for redacted numbers
-            
+
            let result = formatter.applyFormat(
                 to: number.stp_stringByRemovingCharacters(from: allowedCharacterSet.inverted),
                 shouldAppendRemaining: true
             )
-            
-            guard result.count > 0 else {
+
+            guard !result.isEmpty else {
                 return ""
             }
-            
+
             switch format {
             case .e164:
                 var resultDigits = result.stp_stringByRemovingCharacters(from: allowedCharacterSet.inverted)
@@ -103,13 +160,13 @@ import UIKit
                 if resultDigits.hasPrefix("0") {
                     resultDigits = String(resultDigits.suffix(resultDigits.count - 1))
                 }
-                
+
                 resultDigits = prefix.stp_stringByRemovingCharacters(from: allowedCharacterSet.inverted) + resultDigits
                 // e164 doesn't accept more than 15 digits
                 if resultDigits.count > Format.e164FormatMaxDigits {
                     resultDigits = String(resultDigits.prefix(Format.e164FormatMaxDigits))
                 }
-                
+
                 return "+" + resultDigits
             case .national:
                 return result
@@ -117,7 +174,7 @@ import UIKit
                 return prefix + " " + result
             }
         }
-        
+
         // Note: The patterns here are not complete in some cases, e.g.
         // JP where the first group of numbers will sometimes have 3 digits
         // for mobile but we only expect 2. In these cases the input should
@@ -229,7 +286,7 @@ import UIKit
             Metadata(prefix: "+356", regionCode: "MT", pattern: "#### ####"),
             Metadata(prefix: "+357", regionCode: "CY", pattern: "## ######"),
             Metadata(prefix: "+358", regionCode: "FI", pattern: "## ### ## ##"),
-            Metadata(prefix: "+35818", regionCode: "AX", pattern: "## ######"),
+            Metadata(prefix: "+358", regionCode: "AX", pattern: ""),
             Metadata(prefix: "+359", regionCode: "BG", pattern: "### ### ##"),
             Metadata(prefix: "+36", regionCode: "HU", pattern: "## ### ####"),
             Metadata(prefix: "+370", regionCode: "LT", pattern: "### #####"),
@@ -258,14 +315,14 @@ import UIKit
             Metadata(prefix: "+423", regionCode: "LI", pattern: "### ### ###"),
             Metadata(prefix: "+43", regionCode: "AT", pattern: "### ######"),
             Metadata(prefix: "+44", regionCode: "GB", pattern: "#### ######"),
-            Metadata(prefix: "+441481", regionCode: "GG", pattern: "#### ######"),
-            Metadata(prefix: "+441534", regionCode: "JE", pattern: "#### ######"),
-            Metadata(prefix: "+441624", regionCode: "IM", pattern: "#### ######"),
+            Metadata(prefix: "+44", regionCode: "GG", pattern: "#### ######"),
+            Metadata(prefix: "+44", regionCode: "JE", pattern: "#### ######"),
+            Metadata(prefix: "+44", regionCode: "IM", pattern: "#### ######"),
             Metadata(prefix: "+45", regionCode: "DK", pattern: "## ## ## ##"),
             Metadata(prefix: "+46", regionCode: "SE", pattern: "##-### ## ##"),
             Metadata(prefix: "+47", regionCode: "NO", pattern: "### ## ###"),
             Metadata(prefix: "+47", regionCode: "BV", pattern: ""),
-            Metadata(prefix: "+4779", regionCode: "SJ", pattern: "## ## ## ##"),
+            Metadata(prefix: "+47", regionCode: "SJ", pattern: "## ## ## ##"),
             Metadata(prefix: "+48", regionCode: "PL", pattern: "## ### ## ##"),
             Metadata(prefix: "+49", regionCode: "DE", pattern: "### #######"),
             Metadata(prefix: "+500", regionCode: "FK", pattern: ""),
@@ -326,7 +383,7 @@ import UIKit
             Metadata(prefix: "+689", regionCode: "PF", pattern: "## ## ##"),
             Metadata(prefix: "+690", regionCode: "TK", pattern: ""),
             Metadata(prefix: "+7", regionCode: "RU", pattern: "### ###-##-##"),
-            Metadata(prefix: "+77", regionCode: "KZ", pattern: ""),
+            Metadata(prefix: "+7", regionCode: "KZ", pattern: ""),
             Metadata(prefix: "+81", regionCode: "JP", pattern: "##-####-####"),
             Metadata(prefix: "+82", regionCode: "KR", pattern: "##-####-####"),
             Metadata(prefix: "+84", regionCode: "VN", pattern: "## ### ## ##"),

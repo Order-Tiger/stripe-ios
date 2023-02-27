@@ -3,6 +3,7 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 2/25/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
@@ -23,7 +24,7 @@ extension BarcodeDetectorOutput: VisionBasedDetectorOutput {
     ) throws {
         let barcodeObservations: [VNBarcodeObservation] = observations.compactMap {
             guard let observation = $0 as? VNBarcodeObservation,
-                  detector.configuration.symbology == observation.symbology
+                detector.configuration.symbology == observation.symbology
             else {
                 return nil
             }
@@ -58,8 +59,11 @@ final class BarcodeDetector: VisionBasedDetector {
     fileprivate var firstScanTimestamp: Date?
 
     let configuration: Configuration
+    let metricsTracker: MLDetectorMetricsTracker? = nil
 
-    init(configuration: Configuration) {
+    init(
+        configuration: Configuration
+    ) {
         self.configuration = configuration
     }
 

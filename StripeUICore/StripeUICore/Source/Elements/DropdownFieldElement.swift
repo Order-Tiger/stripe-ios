@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import UIKit
 @_spi(STP) import StripeCore
+import UIKit
 
 /**
  A textfield whose input view is a `UIPickerView` with a list of the strings.
@@ -18,19 +18,43 @@ import UIKit
 @objc(STP_Internal_DropdownFieldElement)
 @_spi(STP) public class DropdownFieldElement: NSObject {
     public typealias DidUpdateSelectedIndex = (Int) -> Void
-    
+
     public struct DropdownItem {
+        public init(pickerDisplayName: String, labelDisplayName: String, accessibilityValue: String, rawData: String) {
+            self.pickerDisplayName = pickerDisplayName
+            self.labelDisplayName = labelDisplayName
+            self.accessibilityValue = accessibilityValue
+            self.rawData = rawData
+        }
+
         /// Item label displayed in the picker
-        let pickerDisplayName: String
-        
+        public let pickerDisplayName: String
+
         /// Item label displayed in inline label when item has been selected
-        let labelDisplayName: String
-        
-        /// Accessibility label to use when this is in the inline label
-        let accessibilityLabel: String
+        public let labelDisplayName: String
+
+        /// Accessibility value to use when this is in the inline label
+        public let accessibilityValue: String
+
+        /// The underlying data for this dropdown item.
+        /// e.g., A country dropdown item might display "United States" but its `rawData` is "US".
+        /// This is ignored by `DropdownFieldElement`, and is intended as a convenience to be used in conjunction with `selectedItem`
+        public let rawData: String
     }
 
+    // MARK: - Public properties
     weak public var delegate: ElementDelegate?
+    public let items: [DropdownItem]
+    public var selectedItem: DropdownItem {
+        return items[selectedIndex]
+    }
+    public var selectedIndex: Int {
+        didSet {
+            updatePickerField()
+        }
+    }
+    public var didUpdate: DidUpdateSelectedIndex?
+
     private(set) lazy var pickerView: UIPickerView = {
         let picker = UIPickerView()
         picker.delegate = self
@@ -40,32 +64,22 @@ import UIKit
     private(set) lazy var pickerFieldView: PickerFieldView = {
         let pickerFieldView = PickerFieldView(
             label: label,
-            shouldShowChevron: true,
+            shouldShowChevron: disableDropdownWithSingleElement ? items.count != 1 : true,
             pickerView: pickerView,
-            delegate: self
+            delegate: self,
+            theme: theme
         )
+        if disableDropdownWithSingleElement && items.count == 1 {
+            pickerFieldView.isUserInteractionEnabled = false
+        }
         return pickerFieldView
     }()
-    let items: [DropdownItem]
-    let label: String?
-    public private(set) var selectedIndex: Int
+
+    // MARK: - Private properties
+    private let label: String?
+    private let theme: ElementsUITheme
     private var previouslySelectedIndex: Int
-    public var didUpdate: DidUpdateSelectedIndex?
-    
-    convenience public init(
-        items: [String],
-        defaultIndex: Int = 0,
-        label: String?,
-        didUpdate: DidUpdateSelectedIndex? = nil
-    ) {
-        self.init(items: items.map({ DropdownItem(pickerDisplayName: $0,
-                                                  labelDisplayName: $0,
-                                                  accessibilityLabel: $0) }),
-                  defaultIndex: defaultIndex,
-                  label: label,
-                  didUpdate: didUpdate
-                  )
-    }
+    private let disableDropdownWithSingleElement: Bool
 
     /**
      - Parameters:
@@ -83,12 +97,16 @@ import UIKit
         items: [DropdownItem],
         defaultIndex: Int = 0,
         label: String?,
+        theme: ElementsUITheme = .default,
+        disableDropdownWithSingleElement: Bool = false,
         didUpdate: DidUpdateSelectedIndex? = nil
     ) {
         assert(!items.isEmpty, "`items` must contain at least one item")
 
         self.label = label
+        self.theme = theme
         self.items = items
+        self.disableDropdownWithSingleElement = disableDropdownWithSingleElement
         self.didUpdate = didUpdate
 
         // Default to defaultIndex, if in bounds
@@ -101,11 +119,27 @@ import UIKit
         super.init()
 
         if !items.isEmpty {
-            pickerView.selectRow(defaultIndex, inComponent: 0, animated: false)
-            pickerFieldView.displayText = items[selectedIndex].labelDisplayName
-            pickerFieldView.displayTextAccessibilityLabel = items[selectedIndex].accessibilityLabel
+            updatePickerField()
         }
     }
+
+    public func select(index: Int) {
+        selectedIndex = index
+        didFinish(pickerFieldView)
+    }
+}
+
+private extension DropdownFieldElement {
+
+    func updatePickerField() {
+        if pickerView.selectedRow(inComponent: 0) != selectedIndex {
+            pickerView.selectRow(selectedIndex, inComponent: 0, animated: false)
+        }
+
+        pickerFieldView.displayText = items[selectedIndex].labelDisplayName
+        pickerFieldView.displayTextAccessibilityValue = items[selectedIndex].accessibilityValue
+    }
+
 }
 
 // MARK: Element
@@ -113,6 +147,10 @@ import UIKit
 extension DropdownFieldElement: Element {
     public var view: UIView {
         return pickerFieldView
+    }
+
+    public func beginEditing() -> Bool {
+        return pickerFieldView.becomeFirstResponder()
     }
 }
 
@@ -125,8 +163,6 @@ extension DropdownFieldElement: UIPickerViewDelegate {
 
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedIndex = row
-        pickerFieldView.displayText = items[row].labelDisplayName
-        pickerFieldView.displayTextAccessibilityLabel = items[selectedIndex].accessibilityLabel
     }
 }
 
@@ -152,6 +188,6 @@ extension DropdownFieldElement: PickerFieldViewDelegate {
             didUpdate?(selectedIndex)
         }
         previouslySelectedIndex = selectedIndex
-        delegate?.didFinishEditing(element: self)
+        delegate?.continueToNextField(element: self)
     }
 }

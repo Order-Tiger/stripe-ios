@@ -9,17 +9,32 @@ import Foundation
 
 /// Manager used to aggregate all non-repeating tasks
 struct NonRepeatingTasksManager {
-    /// Default to failure with negative values
-    var cameraPermissionTask: ScanAnalyticsNonRepeatingTask = .init(result: ScanAnalyticsEvent.cameraPermissionFailure.rawValue, startedAtMs: -1, durationMs: -1)
-    var torchSupportedTask: ScanAnalyticsNonRepeatingTask = .init(result: ScanAnalyticsEvent.torchUnsupported.rawValue, startedAtMs: -1, durationMs: -1)
-    var scanActivityTasks: [ScanAnalyticsNonRepeatingTask] = []
+    /// Default unknown values
+    var cameraPermissionTask: TrackableTask = TrackableTask()
+    var completionLoopDuration: TrackableTask = TrackableTask()
+    var imageCompressionDuration: TrackableTask = TrackableTask()
+    var mainLoopDuration: TrackableTask = TrackableTask()
+    var scanActivityTasks: [TrackableTask] = []
+    var torchSupportedTask: TrackableTask = TrackableTask()
 
     /// Create API model
     func generateNonRepeatingTasks() -> NonRepeatingTasks {
+        func unwrapTaskOrDefault(_ task: TrackableTask) -> ScanAnalyticsNonRepeatingTask {
+            return task.toAPIModel()
+                ?? .init(
+                    result: ScanAnalyticsEvent.unknown.rawValue,
+                    startedAtMs: -1,
+                    durationMs: -1
+                )
+        }
+
         return .init(
-            cameraPermissionTask: cameraPermissionTask,
-            torchSupportedTask: torchSupportedTask,
-            scanActivityTasks: scanActivityTasks
+            cameraPermissionTask: unwrapTaskOrDefault(cameraPermissionTask),
+            completionLoopDuration: unwrapTaskOrDefault(completionLoopDuration),
+            imageCompressionDuration: unwrapTaskOrDefault(imageCompressionDuration),
+            mainLoopDuration: unwrapTaskOrDefault(mainLoopDuration),
+            scanActivityTasks: scanActivityTasks.compactMap { $0.toAPIModel() },
+            torchSupportedTask: unwrapTaskOrDefault(torchSupportedTask)
         )
     }
 }

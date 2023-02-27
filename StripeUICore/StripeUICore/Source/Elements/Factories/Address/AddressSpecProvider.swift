@@ -9,13 +9,13 @@
 import Foundation
 @_spi(STP) import StripeCore
 
-// This file was adapted from stripe-js-v3's checkoutSupportedCountries.js
+// This file was adapted from https://git.corp.stripe.com/stripe-internal/stripe-js-v3/blob/bdc2eeed/src/elements/inner/shared/address/addressData.ts
 let addressDataFilename = "localized_address_data"
 
 @_spi(STP) public class AddressSpecProvider {
     @_spi(STP) public static var shared: AddressSpecProvider = AddressSpecProvider()
     var addressSpecs: [String: AddressSpec] = [:]
-    var countries: [String] {
+    public var countries: [String] {
         return addressSpecs.map { $0.key }
     }
     private lazy var addressSpecsUpdateQueue: DispatchQueue = {
@@ -48,7 +48,7 @@ let addressDataFilename = "localized_address_data"
         }
         return promise
     }
-    
+
     func addressSpec(for country: String) -> AddressSpec {
         guard let spec = addressSpecs[country] else {
             return AddressSpec.default

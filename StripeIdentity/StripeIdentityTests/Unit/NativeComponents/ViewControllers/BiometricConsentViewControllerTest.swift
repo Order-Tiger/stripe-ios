@@ -3,10 +3,12 @@
 //  StripeIdentityTests
 //
 //  Created by Mel Ludowise on 2/14/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
 import XCTest
+
 @testable import StripeIdentity
 
 final class BiometricConsentViewControllerTest: XCTestCase {
@@ -20,18 +22,20 @@ final class BiometricConsentViewControllerTest: XCTestCase {
         super.setUp()
 
         vc = try! BiometricConsentViewController(
-            merchantLogo: UIImage(),
-            consentContent: BiometricConsentViewControllerTest.mockVerificationPage.biometricConsent,
+            brandLogo: UIImage(),
+            consentContent: BiometricConsentViewControllerTest.mockVerificationPage
+                .biometricConsent,
             sheetController: mockSheetController
         )
     }
 
     func testAccept() {
+        vc.scrolledToBottom = true
         // Tap accept button
         vc.flowViewModel.buttons.first?.didTap()
 
         // Verify biometricConsent is saved
-        XCTAssertEqual(mockSheetController.savedData?.consent?.biometric, true)
+        XCTAssertEqual(mockSheetController.savedData?.biometricConsent, true)
     }
 
     func testDeny() {
@@ -39,6 +43,6 @@ final class BiometricConsentViewControllerTest: XCTestCase {
         vc.flowViewModel.buttons.last?.didTap()
 
         // Verify biometricConsent is saved
-        XCTAssertEqual(mockSheetController.savedData?.consent?.biometric, false)
+        XCTAssertEqual(mockSheetController.savedData?.biometricConsent, false)
     }
 }

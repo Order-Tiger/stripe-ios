@@ -3,12 +3,17 @@
 //  StripeIdentityTests
 //
 //  Created by Mel Ludowise on 10/27/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import XCTest
 import OHHTTPStubs
-@testable @_spi(STP) import StripeCore
+import OHHTTPStubsSwift
 @_spi(STP) import StripeCoreTestUtils
+import XCTest
+
+// swift-format-ignore
+@testable @_spi(STP) import StripeCore
+
 @testable import StripeIdentity
 
 final class IdentityAPIClientTest: APIStubbedTestCase {
@@ -37,44 +42,55 @@ final class IdentityAPIClientTest: APIStubbedTestCase {
         apiClient.apiClient.urlSession = URLSession(configuration: urlSessionConfig)
     }
 
-    func testCreateVerificationPage() throws {
-        let mockVerificationPage = VerificationPageMock.response200
-        let mockResponseData = try mockVerificationPage.data()
-        let mockResponse = try mockVerificationPage.make()
+    func testCreateVerificationPageWithTypeDoc() throws {
+        try testVerificationPage(with: VerificationPageMock.response200)
+    }
 
-        stub { urlRequest in
-            XCTAssertEqual(urlRequest.url?.absoluteString.hasSuffix("v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)?"), true)
-            XCTAssertEqual(urlRequest.httpMethod, "GET")
-            verifyHeaders(urlRequest: urlRequest)
+    func testCreateVerificationPageWithTypeDocRequireLifeCapture() throws {
+        try testVerificationPage(with: VerificationPageMock.requireLiveCapture)
+    }
 
-            return true
-        } response: { urlRequest in
-            return HTTPStubsResponse(data: mockResponseData, statusCode: 200, headers: nil)
-        }
+    func testCreateVerificationPageWithTypeDocNoSelfie() throws {
+        try testVerificationPage(with: VerificationPageMock.noSelfie)
+    }
 
-        apiClient.getIdentityVerificationPage().observe { result in
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response, mockResponse)
-            case .failure(let error):
-                XCTFail("Request returned error \(error)")
-            }
-            self.exp.fulfill()
-        }
+    func testCreateVerificationPageWithTypeDocRequireIdNumber() throws {
+        try testVerificationPage(with: VerificationPageMock.typeDocumentRequireIdNumber)
+    }
 
-        wait(for: [exp], timeout: 1)
+    func testCreateVerificationPageWithTypeDocRequireAddress() throws {
+        try testVerificationPage(with: VerificationPageMock.typeDocumentRequireAddress)
+    }
+
+    func testCreateVerificationPageWithTypeDocRequireIdNumberAndAddress() throws {
+        try testVerificationPage(with: VerificationPageMock.typeDocumentRequireIdNumberAndAddress)
+    }
+
+    func testCreateVerificationPageWithTypeIdNumber() throws {
+        try testVerificationPage(with: VerificationPageMock.typeIdNumber)
+    }
+
+    func testCreateVerificationPageWithTypeAddress() throws {
+        try testVerificationPage(with: VerificationPageMock.typeAddress)
     }
 
     func testUpdateVerificationPageData() throws {
         let mockVerificationData = VerificationPageDataUpdateMock.default
-        let encodedMockVerificationData = URLEncoder.queryString(from: try mockVerificationData.encodeJSONDictionary())
+        let encodedMockVerificationData = URLEncoder.queryString(
+            from: try mockVerificationData.encodeJSONDictionary()
+        )
 
         let mockVerificationPageData = VerificationPageDataMock.response200
         let mockResponseData = try mockVerificationPageData.data()
         let mockResponse = try mockVerificationPageData.make()
 
         stub { urlRequest in
-            XCTAssertEqual(urlRequest.url?.absoluteString.hasSuffix("v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)/data"), true)
+            XCTAssertEqual(
+                urlRequest.url?.absoluteString.hasSuffix(
+                    "v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)/data"
+                ),
+                true
+            )
             XCTAssertEqual(urlRequest.httpMethod, "POST")
 
             verifyHeaders(urlRequest: urlRequest)
@@ -85,7 +101,7 @@ final class IdentityAPIClientTest: APIStubbedTestCase {
             }
             XCTAssertEqual(String(data: httpBody, encoding: .utf8), encodedMockVerificationData)
             return true
-        } response: { urlRequest in
+        } response: { _ in
             return HTTPStubsResponse(data: mockResponseData, statusCode: 200, headers: nil)
         }
 
@@ -110,14 +126,19 @@ final class IdentityAPIClientTest: APIStubbedTestCase {
         let mockResponse = try mockVerificationPageData.make()
 
         stub { urlRequest in
-            XCTAssertEqual(urlRequest.url?.absoluteString.hasSuffix("v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)/submit"), true)
+            XCTAssertEqual(
+                urlRequest.url?.absoluteString.hasSuffix(
+                    "v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)/submit"
+                ),
+                true
+            )
             XCTAssertEqual(urlRequest.httpMethod, "POST")
 
             verifyHeaders(urlRequest: urlRequest)
 
             XCTAssertEqual(urlRequest.ohhttpStubs_httpBody?.isEmpty, true)
             return true
-        } response: { urlRequest in
+        } response: { _ in
             return HTTPStubsResponse(data: mockResponseData, statusCode: 200, headers: nil)
         }
 
@@ -157,10 +178,9 @@ final class IdentityAPIClientTest: APIStubbedTestCase {
             )
 
             return true
-        } response: { urlRequest in
+        } response: { _ in
             return HTTPStubsResponse(data: mockResponseData, statusCode: 200, headers: nil)
         }
-
 
         apiClient.uploadImage(
             mockImage,
@@ -168,6 +188,39 @@ final class IdentityAPIClientTest: APIStubbedTestCase {
             purpose: mockPurpose,
             fileName: "filename"
         ).observe { result in
+            switch result {
+            case .success((let response, _)):
+                XCTAssertEqual(response, mockResponse)
+            case .failure(let error):
+                XCTFail("Request returned error \(error)")
+            }
+            self.exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 1)
+    }
+
+    private func testVerificationPage(with responseMock: VerificationPageMock) throws {
+        let mockVerificationPage = responseMock
+        let mockResponseData = try mockVerificationPage.data()
+        let mockResponse = try mockVerificationPage.make()
+
+        stub { urlRequest in
+            XCTAssertEqual(
+                urlRequest.url?.absoluteString.hasSuffix(
+                    "v1/identity/verification_pages/\(IdentityAPIClientTest.mockId)?"
+                ),
+                true
+            )
+            XCTAssertEqual(urlRequest.httpMethod, "GET")
+            verifyHeaders(urlRequest: urlRequest)
+
+            return true
+        } response: { _ in
+            return HTTPStubsResponse(data: mockResponseData, statusCode: 200, headers: nil)
+        }
+
+        apiClient.getIdentityVerificationPage().observe { result in
             switch result {
             case .success(let response):
                 XCTAssertEqual(response, mockResponse)
@@ -186,8 +239,18 @@ private func verifyHeaders(
     file: StaticString = #file,
     line: UInt = #line
 ) {
-    XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Authorization"], "Bearer \(IdentityAPIClientTest.mockEAK)", file: file, line: line)
-    XCTAssertEqual(urlRequest.allHTTPHeaderFields?["Stripe-Version"], "2020-08-27; identity_client_api=v1", file: file, line: line)
+    XCTAssertEqual(
+        urlRequest.allHTTPHeaderFields?["Authorization"],
+        "Bearer \(IdentityAPIClientTest.mockEAK)",
+        file: file,
+        line: line
+    )
+    XCTAssertEqual(
+        urlRequest.allHTTPHeaderFields?["Stripe-Version"],
+        "2020-08-27; identity_client_api=v3",
+        file: file,
+        line: line
+    )
 }
 
 private func verifyImageUploadOwnedBy(

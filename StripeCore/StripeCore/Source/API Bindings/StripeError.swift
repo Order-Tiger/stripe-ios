@@ -3,19 +3,20 @@
 //  StripeCore
 //
 //  Created by David Estes on 8/11/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
 
-/// Error codes returned from STPAPIClient
+/// Error codes returned from STPAPIClient.
 @_spi(STP) public enum StripeError: Error {
-    /// The server returned an API error
+    /// The server returned an API error.
     case apiError(StripeAPIError)
 
-    /// The request was invalid
+    /// The request was invalid.
     case invalidRequest
 
-    /// Localized description of the error
+    /// Localized description of the error.
     public var localizedDescription: String {
         return errorDescription ?? NSError.stp_unexpectedErrorMessage()
     }
@@ -58,5 +59,22 @@ extension StripeError: LocalizedError {
         case .invalidRequest:
             return nil
         }
+    }
+}
+
+extension StripeError: AnalyticLoggableError {
+    public func analyticLoggableSerializeForLogging() -> [String: Any] {
+        var code: Int
+        switch self {
+        case .apiError:
+            code = 0
+        case .invalidRequest:
+            code = 1
+        }
+
+        return [
+            "domain": (self as NSError).domain,
+            "code": code,
+        ]
     }
 }

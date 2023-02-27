@@ -3,6 +3,7 @@
 //  StripeIdentityTests
 //
 //  Created by Jaime Park on 1/26/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import UIKit
@@ -11,15 +12,15 @@ private class SnapshotTestClassForBundle {}
 
 struct SnapshotTestMockData {
     enum Image: String {
-        case ciImage = "ciimage_stripeidentity_test"
+        case cgImage = "cgimage_stripeidentity_test"
         case headerIcon = "header_icon"
     }
 
     static let mockDeviceWidth: CGFloat = 375
 
-    static func ciImage(image: Image) -> CIImage {
+    static func cgImage(image: Image) -> CGImage {
         let uiImage = uiImage(image: image)
-        return CIImage(cgImage: uiImage.cgImage!)
+        return uiImage.cgImage!
     }
 
     static func uiImage(image: Image) -> UIImage {

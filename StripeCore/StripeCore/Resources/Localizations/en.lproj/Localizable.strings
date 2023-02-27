@@ -16,6 +16,12 @@
 /* Unexpected error, such as a 500 from Stripe or a JSON parse error */
 "There was an unexpected error -- try again in a few seconds" = "There was an unexpected error -- try again in a few seconds";
 
+/* Text for a retry button */
+"Try again" = "Try again";
+
+/* Informational text informing the user that Stripe is used to process data and a link to Stripe's privacy policy */
+"We use Stripe to verify your card details. Stripe may use and store your data according its privacy policy. <a href='https://support.stripe.com/questions/stripes-card-image-verification'><u>Learn more</u></a>" = "We use Stripe to verify your card details. Stripe may use and store your data according its privacy policy. <a href='https://support.stripe.com/questions/stripes-card-image-verification'><u>Learn more</u></a>";
+
 /* Error when the card has already expired */
 "Your card has expired" = "Your card has expired";
 
@@ -36,4 +42,7 @@
 
 /* Error when customer's name is invalid */
 "Your name is invalid." = "Your name is invalid.";
+
+/* Error message when a payment method gets declined. */
+"Your payment method was declined." = "Your payment method was declined.";
 

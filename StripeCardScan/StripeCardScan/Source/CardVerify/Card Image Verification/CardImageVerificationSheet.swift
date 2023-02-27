@@ -9,6 +9,9 @@ import Foundation
 @_spi(STP) import StripeCore
 import UIKit
 
+/// Typealias for backwards compatibility of new error type name
+typealias CardImageVerificationSheetError = CardScanSheetError
+
 /// The result of an attempt to finish an card image verification flow
 @frozen public enum CardImageVerificationSheetResult {
     /// User completed the verification flow
@@ -19,17 +22,12 @@ import UIKit
     case failed(error: Error)
 }
 
-/**
- A drop-in class that presents a sheet for a user to verify their credit card
- */
-@available(iOS 11.2, *)
+/// A drop-in class that presents a sheet for a user to verify their credit card
 final public class CardImageVerificationSheet {
-    /**
-     Initializes an `CardImageVerificationSheet`
-     - Parameters:
-       - cardImageVerificationIntentId: The id of a Stripe CardImageVerificationIntent object.
-       - cardImageVerificationIntentSecret: The client secret of a Stripe CardImageVerificationIntent object.
-     */
+    /// Initializes an `CardImageVerificationSheet`
+    /// - Parameters:
+    ///   - cardImageVerificationIntentId: The id of a Stripe CardImageVerificationIntent object.
+    ///   - cardImageVerificationIntentSecret: The client secret of a Stripe CardImageVerificationIntent object.
     public init(
         cardImageVerificationIntentId: String,
         cardImageVerificationIntentSecret: String,
@@ -38,18 +36,20 @@ final public class CardImageVerificationSheet {
         // TODO(jaimepark): Add api analytics client as a param when integrating Stripe analytics
         // TODO(jaimepark): Link public documentation for CIV intent when ready
         self.configuration = configuration
-        self.intent = CardImageVerificationIntent(id: cardImageVerificationIntentId, clientSecret: cardImageVerificationIntentSecret)
+        self.intent = CardImageVerificationIntent(
+            id: cardImageVerificationIntentId,
+            clientSecret: cardImageVerificationIntentSecret
+        )
     }
 
-    /**
-     Presents a sheet for a customer to verify their card.
-     - Parameters:
-       - presentingViewController: The view controller to present the card image verification sheet.
-       - completion: Called with the result of the card image verification flow after the sheet is dismissed.
-     */
+    /// Presents a sheet for a customer to verify their card.
+    /// - Parameters:
+    ///   - presentingViewController: The view controller to present the card image verification sheet.
+    ///   - completion: Called with the result of the card image verification flow after the sheet is dismissed.
     public func present(
         from presentingViewController: UIViewController,
-        completion: @escaping (CardImageVerificationSheetResult) -> Void
+        completion: @escaping (CardImageVerificationSheetResult) -> Void,
+        animated: Bool = true
     ) {
         /// Overwrite completion closure to retain self until called
         let completion: (CardImageVerificationSheetResult) -> Void = { result in
@@ -64,7 +64,7 @@ final public class CardImageVerificationSheet {
             civSecret: intent.clientSecret
         ) { result in
             switch result {
-            case .success(let expectedCard):
+            case .success(let response):
                 /// Initialize the civ controller
                 let cardImageVerificationController =
                     CardImageVerificationController(
@@ -77,15 +77,16 @@ final public class CardImageVerificationSheet {
 
                 /// Present the verify view controller
                 cardImageVerificationController.present(
-                    with: expectedCard,
-                    from: presentingViewController
+                    with: response.expectedCard,
+                    and: response.acceptedImageConfigs,
+                    from: presentingViewController,
+                    animated: animated
                 )
             case .failure(let error):
                 self.completion?(.failed(error: error))
             }
         }
     }
-
 
     private let configuration: Configuration
     private let intent: CardImageVerificationIntent
@@ -94,30 +95,28 @@ final public class CardImageVerificationSheet {
     private var verificationController: CardImageVerificationController?
 }
 
-@available(iOS 11.2, *)
-private extension CardImageVerificationSheet {
-    typealias Result = Swift.Result
+extension CardImageVerificationSheet {
+    fileprivate typealias Result = Swift.Result
 
     /// Fetches the CIV optional card details
-    func load(
+    fileprivate func load(
         civId: String,
         civSecret: String,
-        completion: @escaping ((Result<CardImageVerificationExpectedCard?, Error>) -> Void)
+        completion: @escaping ((Result<CardImageVerificationDetailsResponse, Error>) -> Void)
     ) {
+        /// Clear the scan analytics manager since it is the beginning of a new session
+        ScanAnalyticsManager.shared.reset()
+
         configuration.apiClient.fetchCardImageVerificationDetails(
             cardImageVerificationSecret: civSecret,
             cardImageVerificationId: civId
-        ).chained { response in
-            // Transforms response to expectedCard
-            return Promise(value: response.expectedCard)
-          }.observe { result in
+        ).observe { result in
             completion(result)
-          }
+        }
     }
 }
 
 // MARK: Card Image Verification Controller Delegate
-@available(iOS 11.2, *)
 extension CardImageVerificationSheet: CardImageVerificationControllerDelegate {
     func cardImageVerificationController(
         _ controller: CardImageVerificationController,

@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Du kan även manuellt ladda upp ett foto av din id-handling.";
+
 "App Settings" = "Appinställningar";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "Bilden på körkortets baksida har laddats upp";
+
+"Back identity card photo successfully uploaded" = "Bilden på id-kortets baksida har laddats upp";
+
 "Back of driver's license" = "Baksida av körkort";
 
-/* Description of back of identity card image */
 "Back of identity card" = "Baksida av id-kort";
 
-/* Title displayed when requesting camera permissions */
 "Camera permission" = "Kamerabehörighet";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Kamera ej tillgänglig";
+
+"Capturing…" = "Tar bild …";
+
 "Choose File" = "Välj fil";
 
-/* Label for Date of birth field */
+"Consent" = "Samtycke";
+
+"Could not capture image" = "Det gick inte att ta bilden";
+
 "Date of birth" = "Födelsedatum";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Körkort";
+"File Upload" = "Ladda upp fil";
 
-/* Title of identity document file upload screen */
 "File upload" = "Ladda upp fil";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Vänd på körkortet";
+
+"Flip your identity card over to the other side" = "Vänd på id-handlingen";
+
+"Front driver's license photo successfully uploaded" = "Bilden på körkortets framsida har laddats upp";
+
+"Front identity card photo successfully uploaded" = "Bilden på id-kortets framsida har laddats upp";
+
 "Front of driver's license" = "Framsida av körkort";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Framsida av id-kort";
 
-/* Label for ID number section */
+"Go Back" = "Gå tillbaka";
+
+"Hold still, scanning" = "Rör dig inte, dokumentet skannas in";
+
 "ID Number" = "ID-nummer";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Id-kort";
+"ID Type" = "Typ av id-handling";
 
-/* Description of passport image */
 "Image of passport" = "Bild av pass";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Laddar";
+
 "Passport" = "Pass";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Passfotot har laddats upp";
+
 "Personal ID number" = "Personligt ID-nummer";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Fotobibliotek";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Ladda upp en bild på ditt pass";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Ladda upp bilderna på fram- och baksidan av ditt körkort";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Ladda upp bilderna på fram- och baksidan av ditt id-kort";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Placera körkortet i mitten av ramen";
+
+"Position your face in the center of the frame." = "Placera ansiktet i mitten av ramen.";
+
+"Position your identity card in the center of the frame" = "Placera id-kortet i mitten av ramen";
+
+"Position your passport in the center of the frame" = "Placera passet i mitten av ramen";
+
+"Scan" = "Skanna dokument";
+
+"Scanned" = "Dokumentet har skannats";
+
 "Select" = "Välj";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Välj från vilken plats du vill ladda upp baksidan på din id-handling";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Välj från vilken plats du vill ladda upp framsidan på din id-handling";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Välj en bild på körkortets baksida";
+
+"Select back identity card photo" = "Välj en bild på id-kortets baksida";
+
+"Select front driver's license photo" = "Välj en bild på körkortets framsida";
+
+"Select front identity card photo" = "Välj en bild på id-kortets framsida";
+
+"Select passport photo" = "Välj passfoto";
+
+"Selfie" = "Selfie";
+
+"Selfie captures" = "Selfiebilder";
+
+"Selfie captures are complete" = "Selfiebilderna har tagits";
+
 "Take Photo" = "Ta bild";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Försök igen";
+"The images of your identity document have not been saved. Do you want to leave?" = "Bilderna av din id-handling har inte sparats. Vill du avsluta?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
-"Unable to establish a connection." = "Det går inte att upprätta en anslutning.";
+"There was an error accessing the camera." = "Ett fel uppstod vid åtkomst till kameran.";
 
-/* Back button label for the identity document file upload screen */
+"Try Again" = "Försök igen";
+
+"Unable to establish a connection." = "Det gick inte att upprätta en anslutning.";
+
+"Unsaved changes" = "Ändringarna har inte sparats";
+
 "Upload" = "Ladda upp";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Ladda upp en bild";
+
+"Uploading back driver's license photo" = "Laddar upp bild på körkortets baksida";
+
+"Uploading back identity card photo" = "Laddar upp bild på id-kortets baksida";
+
+"Uploading front driver's license photo" = "Laddar upp bild på körkortets framsida";
+
+"Uploading front identity card photo" = "Laddar upp bild på id-kortets framsida";
+
+"Uploading passport photo" = "Laddar upp passfoto";
+
 "Verify your identity" = "Verifiera din identitet";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Det gick inte att ta en bild av hög kvalitet.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Vi behöver behörighet att använda din kamera. Tillåt kameraåtkomst i appens inställningar.";
 
+"You can either try again or upload an image from your device." = "Du kan antingen försöka igen eller ladda upp en bild från din enhet.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Dina selfies har inte sparats. Vill du avsluta?";

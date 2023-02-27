@@ -6,12 +6,13 @@
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import WebKit
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
 @_spi(STP) import StripeCore
+import WebKit
 
 @testable import StripeIdentity
 
+@available(iOS 14.3, *)
 final class VerificationFlowWebViewSnapshotTests: FBSnapshotTestCase {
 
     private var verificationWebView: VerificationFlowWebView!
@@ -19,7 +20,7 @@ final class VerificationFlowWebViewSnapshotTests: FBSnapshotTestCase {
 
     override func setUp() {
         super.setUp()
-//        recordMode = true
+        //        recordMode = true
 
         // Reset expectation
         didFinishLoadingExpectation = XCTestExpectation(description: "WebView finished loading")
@@ -45,42 +46,44 @@ final class VerificationFlowWebViewSnapshotTests: FBSnapshotTestCase {
 
     func testLoading() {
         verificationWebView.load()
-        FBSnapshotVerifyView(verificationWebView)
+        STPSnapshotVerifyView(verificationWebView)
     }
 
     func testLoaded() {
         verificationWebView.load()
 
-        wait(for: [
-            didFinishLoadingExpectation,
-        ], timeout: 5)
+        wait(
+            for: [
+                didFinishLoadingExpectation
+            ],
+            timeout: 5
+        )
 
-        /*
-         NOTE(mludowise): The WKWebView takes additional time to render the html
-         after it's finished loading, and does not provide a delegate callback
-         to know when this is completed. So for the sake of this test, we'll just
-         set the background color of the webView to ensure it's visible and not
-         obstructed after load finishes.
-         */
+        // NOTE(mludowise): The WKWebView takes additional time to render the html
+        // after it's finished loading, and does not provide a delegate callback
+        // to know when this is completed. So for the sake of this test, we'll just
+        // set the background color of the webView to ensure it's visible and not
+        // obstructed after load finishes.
         verificationWebView.webView.backgroundColor = .purple
 
-        FBSnapshotVerifyView(verificationWebView)
+        STPSnapshotVerifyView(verificationWebView)
     }
 
     func testError() {
         verificationWebView.displayRetryMessage()
-        FBSnapshotVerifyView(verificationWebView)
+        STPSnapshotVerifyView(verificationWebView)
     }
 }
 
+@available(iOS 14.3, *)
 extension VerificationFlowWebViewSnapshotTests: VerificationFlowWebViewDelegate {
-    func verificationFlowWebView(_ view: VerificationFlowWebView, didChangeURL url: URL?) { }
+    func verificationFlowWebView(_ view: VerificationFlowWebView, didChangeURL url: URL?) {}
 
     func verificationFlowWebViewDidFinishLoading(_ view: VerificationFlowWebView) {
         didFinishLoadingExpectation.fulfill()
     }
 
-    func verificationFlowWebViewDidClose(_ view: VerificationFlowWebView) { }
+    func verificationFlowWebViewDidClose(_ view: VerificationFlowWebView) {}
 
-    func verificationFlowWebView(_ view: VerificationFlowWebView, didOpenURLInNewTarget url: URL) { }
+    func verificationFlowWebView(_ view: VerificationFlowWebView, didOpenURLInNewTarget url: URL) {}
 }

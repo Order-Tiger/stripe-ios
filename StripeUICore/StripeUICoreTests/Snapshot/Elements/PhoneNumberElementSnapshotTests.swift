@@ -2,42 +2,68 @@
 //  PhoneNumberElementSnapshotTests.swift
 //  StripeUICoreTests
 //
-//  Created by Cameron Sabol on 10/20/21.
+//  Created by Yuki Tokuhiro on 6/23/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
 import StripeCoreTestUtils
 @_spi(STP) @testable import StripeUICore
 
 class PhoneNumberElementSnapshotTests: FBSnapshotTestCase {
-    
-    let indexOfUS: Int? = {
-        PhoneNumberElement().sortedRegionInfo.firstIndex { regionInfo in
-            regionInfo.regionCode == "US"
-        }
-    }()
-    
-    func verify(_ phoneElement: PhoneNumberElement,
-                file: StaticString = #filePath,
-                line: UInt = #line) {
-        let view = phoneElement.view
-        view.autosizeHeight(width: 200)
-        FBSnapshotVerifyView(view, file: file, line: line)
-    }
 
     override func setUp() {
         super.setUp()
 //        recordMode = true
     }
-    
+
     func testEmptyUS() {
-        guard let indexOfUS = indexOfUS else {
-            XCTFail("Missing index of US")
-            return
-        }
-        let phoneNumberElement = PhoneNumberElement()
-        phoneNumberElement.regionElement.pickerView(phoneNumberElement.regionElement.pickerView, didSelectRow: indexOfUS, inComponent: 0)
-        verify(phoneNumberElement)
+        let sut = PhoneNumberElement(
+            allowedCountryCodes: ["US"],
+            defaultCountryCode: "US",
+            locale: Locale(identifier: "en_US")
+        )
+        verify(sut)
+    }
+
+    func testEmptyGB() {
+        let sut = PhoneNumberElement(
+            allowedCountryCodes: ["GB"],
+            defaultCountryCode: "GB",
+            locale: Locale(identifier: "en_GB")
+        )
+        verify(sut)
+    }
+
+    func testFilledUS() {
+        let sut = PhoneNumberElement(
+            allowedCountryCodes: ["US"],
+            defaultCountryCode: "US",
+            defaultPhoneNumber: "3105551234",
+            locale: Locale(identifier: "en_US")
+        )
+        verify(sut)
+    }
+
+    func testFilledGB() {
+        let sut = PhoneNumberElement(
+            allowedCountryCodes: ["GB"],
+            defaultCountryCode: "GB",
+            defaultPhoneNumber: "442071838750",
+            locale: Locale(identifier: "en_GB")
+        )
+        verify(sut)
+    }
+
+    func verify(
+        _ sut: PhoneNumberElement,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let section = SectionElement(elements: [sut])
+        let view = section.view
+        view.autosizeHeight(width: 320)
+        STPSnapshotVerifyView(view, file: file, line: line)
     }
 
 }

@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Voit vaihtoehtoisesti ladata henkilöllisyysasiakirjan kuvan manuaalisesti.";
+
 "App Settings" = "Sovelluksen asetukset";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "Ajokortin takapuolen kuva ladattu onnistuneesti";
+
+"Back identity card photo successfully uploaded" = "Henkilökortin takapuolen kuva ladattu onnistuneesti";
+
 "Back of driver's license" = "Ajokortin takapuoli";
 
-/* Description of back of identity card image */
 "Back of identity card" = "Henkilökortin takapuoli";
 
-/* Title displayed when requesting camera permissions */
 "Camera permission" = "Kameran käyttöoikeus";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Kamera ei käytössä";
+
+"Capturing…" = "Otetaan kuvaa...";
+
 "Choose File" = "Valitse tiedosto";
 
-/* Label for Date of birth field */
+"Consent" = "Suostumus";
+
+"Could not capture image" = "Kuvaa ei voitu ottaa";
+
 "Date of birth" = "Syntymäaika";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Ajokortti";
+"File Upload" = "Tiedoston lataus";
 
-/* Title of identity document file upload screen */
 "File upload" = "Tiedoston lataus";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Käännä ajokortti toisinpäin";
+
+"Flip your identity card over to the other side" = "Käännä henkilökortti toisinpäin";
+
+"Front driver's license photo successfully uploaded" = "Ajokortin etupuolen kuva ladattu onnistuneesti";
+
+"Front identity card photo successfully uploaded" = "Henkilökortin etupuolen kuva ladattu onnistuneesti";
+
 "Front of driver's license" = "Ajokortin etupuoli";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Henkilökortin etupuoli";
 
-/* Label for ID number section */
+"Go Back" = "Siirry takaisin";
+
+"Hold still, scanning" = "Odota, skannaus kesken";
+
 "ID Number" = "Tunnusnumero";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Henkilöllisyysasiakirja";
+"ID Type" = "Henkilökortin tyyppi";
 
-/* Description of passport image */
 "Image of passport" = "Passin kuva";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Ladataan";
+
 "Passport" = "Passi";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Passikuva ladattu onnistuneesti";
+
 "Personal ID number" = "Henkilötunnus";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Kuvakirjasto";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Lataa kuva passista";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Lataa ajokortin etu- ja takapuolen kuvat";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Lataa henkilökortin etu- ja takapuolen kuvat";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Aseta ajokortti kehyksen keskelle";
+
+"Position your face in the center of the frame." = "Aseta kasvosi kuvan keskelle.";
+
+"Position your identity card in the center of the frame" = "Aseta henkilökortti kehyksen keskelle";
+
+"Position your passport in the center of the frame" = "Aseta passi kehyksen keskelle";
+
+"Scan" = "Skannaa";
+
+"Scanned" = "Skannattu";
+
 "Select" = "Valitse";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Valitse sijainti, josta haluat ladata henkilöllisyysasiakirjan takapuolen";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Valitse sijainti, josta haluat ladata henkilöllisyysasiakirjan etupuolen";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Valitse ajokortin takapuolen kuva";
+
+"Select back identity card photo" = "Valitse henkilökortin takapuolen kuva";
+
+"Select front driver's license photo" = "Valitse ajokortin etupuolen kuva";
+
+"Select front identity card photo" = "Valitse henkilökortin etupuolen kuva";
+
+"Select passport photo" = "Valitse passikuva";
+
+"Selfie" = "Selfie";
+
+"Selfie captures" = "Selfiet";
+
+"Selfie captures are complete" = "Selfien ottaminen suortitettu";
+
 "Take Photo" = "Ota kuva";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Yritä uudelleen";
+"The images of your identity document have not been saved. Do you want to leave?" = "Henkilöllisyysasiakirjan kuvia ei ole tallennettu. Haluatko poistua?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "Kameran käytössä tapahtui virhe.";
+
+"Try Again" = "Yritä uudelleen";
+
 "Unable to establish a connection." = "Yhteyttä ei voida muodostaa.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Tallentamattomat muutokset";
+
 "Upload" = "Lataa";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Lataa kuva";
+
+"Uploading back driver's license photo" = "Ladataan ajokortin takapuolen kuvaa";
+
+"Uploading back identity card photo" = "Ladataan henkilökortin takapuolen kuvaa";
+
+"Uploading front driver's license photo" = "Ladataan ajokortin etupuolen kuvaa";
+
+"Uploading front identity card photo" = "Ladataan henkilökortin etupuolen kuvaa";
+
+"Uploading passport photo" = "Ladataan passikuvaa";
+
 "Verify your identity" = "Vahvista henkilöllisyytesi";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Emme kyenneet ottamaan korkealaatuista kuvaa.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Tarvitsemme kameran käyttöoikeuden. Salli käyttöoikeus sovelluksen asetuksissa.";
 
+"You can either try again or upload an image from your device." = "Voit joko yrittää uudelleen tai ladata kuvan laitteestasi.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Selfiekuviasi ei ole tallennettu. Haluatko poistua?";

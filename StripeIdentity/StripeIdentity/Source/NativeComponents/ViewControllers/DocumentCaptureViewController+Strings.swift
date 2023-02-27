@@ -3,9 +3,11 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 2/7/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
+@_spi(STP) import StripeCore
 
 @available(iOSApplicationExtension, unavailable)
 extension DocumentCaptureViewController {
@@ -44,7 +46,8 @@ extension DocumentCaptureViewController {
         for side: DocumentSide,
         foundClassification: IDDetectorOutput.Classification?
     ) -> String {
-        let matchesClassification = foundClassification?.matchesDocument(type: documentType, side: side) ?? false
+        let matchesClassification =
+            foundClassification?.matchesDocument(type: documentType, side: side) ?? false
 
         switch (documentType, side, matchesClassification) {
         case (.drivingLicense, .front, false):
@@ -87,53 +90,30 @@ extension DocumentCaptureViewController {
         )
     }
 
-    static var noCameraAccessErrorTitleText: String {
-        STPLocalizedString(
-            "Camera permission",
-            "Error title displayed to the user when camera permissions have been denied"
-        )
-    }
-
     var noCameraAccessErrorBodyText: String {
         if apiConfig.requireLiveCapture {
-            return STPLocalizedString(
-                "We need permission to use your camera. Please allow camera access in app settings.",
-                "Error text displayed to the user when camera permissions have been denied"
-            )
+            return .Localized.noCameraAccessErrorBodyText
         }
 
-        return STPLocalizedString(
-            "We need permission to use your camera. Please allow camera access in app settings.\n\nAlternatively, you may manually upload a photo of your identity document.",
-            "Error text displayed to the user when camera permissions have been denied and manually uploading a file is allowed"
+        let line2 = STPLocalizedString(
+            "Alternatively, you may manually upload a photo of your identity document.",
+            "Line 2 of error text displayed to the user when camera permissions have been denied and manually uploading a file is allowed"
         )
-    }
 
-    static var cameraUnavailableErrorTitleText: String {
-        STPLocalizedString(
-            "Camera unavailable",
-            "Error title displayed to the user when the device's camera is not available"
-        )
-    }
-
-    static var cameraUnavailableErrorBodyText: String {
-        STPLocalizedString(
-            "There was an error accessing the camera.",
-            "Error text displayed to the user when the device's camera is not available"
-        )
-    }
-
-    static var timeoutErrorTitleText: String {
-        STPLocalizedString(
-            "Could not capture image",
-            "Error title displayed to the user if we could not scan a high quality image of the user's identity document in a reasonable amount of time"
-        )
+        return "\(String.Localized.noCameraAccessErrorBodyText)\n\n\(line2)"
     }
 
     var timeoutErrorBodyText: String {
-        return STPLocalizedString(
-            "We could not capture a high-quality image.\n\nYou can either try again or upload an image from your device.",
-            "Error text displayed to the user if we could not scan a high quality image of the user's identity document in a reasonable amount of time and manually uploading a file is allowed"
+        if apiConfig.requireLiveCapture {
+            return .Localized.timeoutErrorBodyText
+        }
+
+        let line2 = STPLocalizedString(
+            "You can either try again or upload an image from your device.",
+            "Line 2 of error text displayed to the user if we could not scan a high quality image of the user's identity document in a reasonable amount of time and manually uploading a file is allowed"
         )
+
+        return "\(String.Localized.timeoutErrorBodyText)\n\n\(line2)"
     }
 
     static var uploadButtonText: String {

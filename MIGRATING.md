@@ -1,7 +1,26 @@
 ## Migration Guides
+### Migrating from versions < 23.0.0
+* The `Stripe` module is now split between `StripePaymentSheet`, `StripePayments`, and `StripePaymentsUI`. Some manual changes may be required. Migration instructions are available at [https://stripe.com/docs/mobile/ios/sdk-23-migration](https://stripe.com/docs/mobile/ios/sdk-23-migration).
+* [Changed] If you use PaymentSheet, you must now `import StripePaymentSheet`. PaymentSheet users no longer need to import the `Stripe` module.
+* [Changed] The minimum iOS version is now 13.0. If you'd like to deploy for iOS 12.0, please use Stripe SDK 22.8.4.
+* [Changed] STPPaymentCardTextField's `cardParams` parameter has been deprecated in favor of `paymentMethodParams`, making it easier to include the postal code from the card field. If you need to access the `STPPaymentMethodCardParams`, use `.paymentMethodParams.card`.
+  * Note that `.paymentMethodParams` returns a copy, so `paymentMethodParams.card` should not be set directly. If you need to set the card information, set `.paymentMethodParams` to a new STPPaymentMethodParams:
+```
+cardField.paymentMethodParams = STPPaymentMethodParams(card: card, billingDetails: nil, metadata: nil)
+```
+
+### Migrating from versions < 22.8.0
+* `PaymentSheet.reset()` has been renamed to `PaymentSheet.resetCustomer()`. If calling the former method, follow the warning in Xcode and apply the suggested fix-it.
+
+### Migrating from versions < 22.2.0
+* `StripeConnections` SDK has been renamed to `StripeFinancialConnections`. If you included `StripeConnections` to support ACH Direct Debit payments, you will need to rename the dependency to `StripeFinancialConnections`. If you are manually installing `StripeConnections`, you will need to remove the old `StripeConnections.xcframework` and include the new `StripeFinancialConnections.xcframework`, which can be found in the [release assets](https://github.com/stripe/stripe-ios/releases/tag/22.2.0) for version 22.2.0 of the SDK.
+
+### Migrating from versions < 22.0.0
+* The minimum iOS version is now 12.0. If you'd like to deploy for iOS 11.0, please use Stripe SDK 21.12.0.
+* `IdentityVerificationSheet` now has an availability requirement of iOS 14.3 on its initializer instead of the `present` method. If your app supports iOS versions < 14.3, you will need to add an availability check for iOS 14.3 before initializing the sheet.
 
 ### Migrating from versions < 21.12.0
-* `Stripe` now requires `StripeApplePay`. If you are manually installing `Stripe`, you will need to include `StripeApplePay.xcframework`, which can be found in the [release assets](https://github.com/stripe/stripe-ios/releases/tag/x.x.x) for version x.x.x of the SDK. If you are using CocoaPods or Swift Package Manager, these dependencies will be imported automatically.
+* `Stripe` now requires `StripeApplePay`. If you are manually installing `Stripe`, you will need to include `StripeApplePay.xcframework`, which can be found in the [release assets](https://github.com/stripe/stripe-ios/releases/tag/21.12.0) for version 21.12.0 of the SDK. If you are using CocoaPods or Swift Package Manager, these dependencies will be imported automatically.
 
 ### Migrating from versions < 21.10.0
 * `StripeIdentity` now requires `StripeCameraCore`. If you are manually installing `StripeIdentity`, you will need to include `StripeCameraCore.xcframework`, which can be found in the [release assets](https://github.com/stripe/stripe-ios/releases/tag/21.10.0) for version 21.10.0 of the SDK. If you are using CocoaPods or Swift Package Manager, these dependencies will be imported automatically.
@@ -55,7 +74,7 @@ You are affected by this change if:
 2. You use one of the above affected classes
 3. You set different `stripeAccount` values on `STPPaymentConfiguration` and `STPAPIClient`, i.e. `STPPaymentConfiguration.shared.stripeAccount != STPAPIClient.shared.stripeAccount`
 
-If all three of the above conditions are true, you must update your integration! The SDK used to send `STPPaymentConfiguration.shared.stripeAccount`, and will now send `STPAPIClient.shared.stripeAccount`.  
+If all three of the above conditions are true, you must update your integration! The SDK used to send `STPPaymentConfiguration.shared.stripeAccount`, and will now send `STPAPIClient.shared.stripeAccount`.
 
 For example, if you are a Connect user who stores Payment Methods on your platform, but clones PaymentMethods to a connected account and creates direct charges on that connected account i.e. if:
 

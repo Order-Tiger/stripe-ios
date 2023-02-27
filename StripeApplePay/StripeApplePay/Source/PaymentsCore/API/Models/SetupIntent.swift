@@ -1,6 +1,6 @@
 //
 //  SetupIntent.swift
-//  StripeiOS
+//  StripeApplePay
 //
 //  Created by David Estes on 6/29/21.
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
@@ -10,13 +10,13 @@ import Foundation
 @_spi(STP) import StripeCore
 
 extension StripeAPI {
-    @_spi(STP) public struct SetupIntent: StripeDecodable {
+    @_spi(STP) public struct SetupIntent: UnknownFieldsDecodable {
         @_spi(STP) public let id: String
         // TODO: (MOBILESDK-467) Add modern bindings for more SetupIntent fields
         @_spi(STP) public let status: SetupIntentStatus?
-        
+
         /// Status types for an STPSetupIntent
-        @frozen @_spi(STP) public enum SetupIntentStatus: String, StripeEnumCodable {
+        @frozen @_spi(STP) public enum SetupIntentStatus: String, SafeEnumCodable {
             /// Unknown status
             case unknown
             /// This SetupIntent requires a PaymentMethod
@@ -32,7 +32,7 @@ extension StripeAPI {
             case succeeded
             /// This SetupIntent was canceled and cannot be changed.
             case canceled
-            
+
             case unparsable
             // TODO: This is @frozen because of a bug in the Xcode 12.2 Swift compiler.
             // Remove @frozen after Xcode 12.2 support has been dropped.

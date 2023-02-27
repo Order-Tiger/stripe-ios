@@ -1,3 +1,4 @@
+//
 //  NSMutableURLRequest+StripeTest.swift
 //  StripeCoreTests
 //
@@ -5,9 +6,8 @@
 //  Copyright © 2016 Stripe, Inc. All rights reserved.
 //
 
-import XCTest
-
 @_spi(STP) import StripeCore
+import XCTest
 
 class NSMutableURLRequest_StripeTest: XCTestCase {
     func testAddParametersToURL_noQuery() {
@@ -16,7 +16,7 @@ class NSMutableURLRequest_StripeTest: XCTestCase {
             request = URLRequest(url: url)
         }
         request?.stp_addParameters(toURL: [
-            "foo": "bar"
+            "foo": "bar",
         ])
 
         XCTAssertEqual(request?.url?.absoluteString, "https://example.com?foo=bar")
@@ -28,7 +28,7 @@ class NSMutableURLRequest_StripeTest: XCTestCase {
             request = URLRequest(url: url)
         }
         request?.stp_addParameters(toURL: [
-            "foo": "bar"
+            "foo": "bar",
         ])
 
         XCTAssertEqual(request?.url?.absoluteString, "https://example.com?a=b&foo=bar")

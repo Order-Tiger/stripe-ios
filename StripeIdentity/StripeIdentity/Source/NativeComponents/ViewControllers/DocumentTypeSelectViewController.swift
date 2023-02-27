@@ -3,11 +3,29 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 11/5/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
 @_spi(STP) import StripeCore
 @_spi(STP) import StripeUICore
+import UIKit
+
+enum DocumentTypeSelectViewControllerError: AnalyticLoggableError {
+    case noValidDocumentTypes(providedDocumentTypes: [String])
+
+    func analyticLoggableSerializeForLogging() -> [String: Any] {
+        var payload: [String: Any]
+        switch self {
+        case .noValidDocumentTypes(let providedDocumentTypes):
+            payload = [
+                "type": "no_valid_document_types",
+                "provided_document_types": providedDocumentTypes,
+            ]
+        }
+        payload["domain"] = (self as NSError).domain
+        return payload
+    }
+}
 
 final class DocumentTypeSelectViewController: IdentityFlowViewController {
 
@@ -19,31 +37,18 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
     }
 
     var documentTypeWithLabels: [DocumentTypeAndLabel] {
-        /*
-         Translate the dictionary returned by the server into a `DocumentType`
-         with a display label.
+        // Translate the dictionary returned by the server into a `DocumentType`
+        // with a display label.
+        //
+        // The results should be:
+        // - Sorted by display order
+        // - Filtered such that document types recognized by the client are represented
 
-         The results should be:
-         - Sorted by display order
-         - Filtered such that document types recognized by the client are represented
-
-         If there are no document types recognized by the client, default to
-         displaying all document types as valid options.
-         */
-
-        let fromServer: [DocumentTypeAndLabel] = DocumentType.allCases.compactMap {
+        return DocumentType.allCases.compactMap {
             guard let label = staticContent.idDocumentTypeAllowlist[$0.rawValue] else {
                 return nil
             }
             return DocumentTypeAndLabel(documentType: $0, label: label)
-        }
-        guard fromServer.isEmpty else {
-            return fromServer
-        }
-
-        // If no valid `DocumentType` was returned by the server, then default to all types
-        return DocumentType.allCases.map {
-            DocumentTypeAndLabel(documentType: $0, label: $0.defaultLabel)
         }
     }
 
@@ -54,7 +59,7 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
     var viewModel: InstructionListView.ViewModel {
         guard documentTypeWithLabels.count != 1 else {
             return .init(
-                instructionText: documentTypeWithLabels[0].label,
+                instructionText: staticContent.body,
                 listViewModel: nil
             )
         }
@@ -69,7 +74,7 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
             }
 
             // Display loading indicator if we're currently saving
-            var accessoryViewModel: ListItemView.ViewModel.Accessory? = nil
+            var accessoryViewModel: ListItemView.ViewModel.Accessory?
             if currentlySavingSelectedDocument == documentTypeAndLabel.documentType {
                 accessoryViewModel = .activityIndicator
             }
@@ -101,7 +106,7 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
 
     // Gets set to user-selected document type.
     // After selection is saved, is reset to nil.
-    private(set) var currentlySavingSelectedDocument: DocumentType? = nil {
+    private(set) var currentlySavingSelectedDocument: DocumentType? {
         didSet {
             guard oldValue != currentlySavingSelectedDocument else {
                 return
@@ -112,19 +117,28 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
 
     // MARK: - Configuration
 
-    let staticContent: VerificationPageStaticContentDocumentSelectPage
+    let staticContent: StripeAPI.VerificationPageStaticContentDocumentSelectPage
 
-    init(sheetController: VerificationSheetControllerProtocol,
-         staticContent: VerificationPageStaticContentDocumentSelectPage) {
+    init(
+        sheetController: VerificationSheetControllerProtocol,
+        staticContent: StripeAPI.VerificationPageStaticContentDocumentSelectPage
+    ) throws {
 
         self.staticContent = staticContent
-        super.init(sheetController: sheetController)
+        super.init(sheetController: sheetController, analyticsScreenName: .documentTypeSelect)
+
+        guard !documentTypeWithLabels.isEmpty else {
+            throw DocumentTypeSelectViewControllerError.noValidDocumentTypes(
+                providedDocumentTypes: Array(staticContent.idDocumentTypeAllowlist.keys)
+            )
+        }
 
         updateUI()
-
     }
 
-    required init?(coder: NSCoder) {
+    required init?(
+        coder: NSCoder
+    ) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -137,7 +151,7 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
             ),
             viewModel: .init(
                 headerViewModel: .init(
-                    backgroundColor: CompatibleColor.systemBackground,
+                    backgroundColor: .systemBackground,
                     headerType: .plain,
                     titleText: staticContent.title
                 ),
@@ -154,13 +168,16 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
         // Disable tap and show activity indicator while we're saving
         currentlySavingSelectedDocument = documentType
 
-        sheetController?.saveAndTransition(collectedData: .init(
-            idDocumentType: documentType
-        )) { [weak self] in
-                // Re-enable tap & stop activity indicator so the user can
-                // make a different selection if they come back to this
-                // screen after hitting the back button.
-                self?.currentlySavingSelectedDocument = nil
+        sheetController?.saveAndTransition(
+            from: analyticsScreenName,
+            collectedData: .init(
+                idDocumentType: documentType
+            )
+        ) { [weak self] in
+            // Re-enable tap & stop activity indicator so the user can
+            // make a different selection if they come back to this
+            // screen after hitting the back button.
+            self?.currentlySavingSelectedDocument = nil
         }
     }
 }
@@ -168,23 +185,7 @@ final class DocumentTypeSelectViewController: IdentityFlowViewController {
 // MARK: - IdentityDataCollecting
 
 extension DocumentTypeSelectViewController: IdentityDataCollecting {
-    var collectedFields: Set<VerificationPageFieldType> {
+    var collectedFields: Set<StripeAPI.VerificationPageFieldType> {
         return [.idDocumentType]
-    }
-}
-
-// MARK: - Default Labels
-
-private extension DocumentType {
-    // Label to display for each document type if the server doesn't return one
-    var defaultLabel: String {
-        switch self {
-        case .passport:
-            return String.Localized.passport
-        case .drivingLicense:
-            return String.Localized.driving_license
-        case .idCard:
-            return String.Localized.id_card
-        }
     }
 }

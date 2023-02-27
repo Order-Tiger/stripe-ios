@@ -1,117 +1,119 @@
-/* The label of a text field that is optional. For example, 'Email (optional)' or 'Name (optional) */
 "%@ (optional)" = "%@ (valfritt)";
 
-/* Caption for Address field on address form */
+"Account number" = "Kontonummer";
+
 "Address" = "Adresse";
 
-/* Address line 1 placeholder for billing address form. */
 "Address line 1" = "Adresselinje 1";
 
-/* Label for input requesting address line 2, used for international addresses */
 "Address line 2" = "Adresselinje 2";
 
-/* Label of an address field in hk */
 "Area" = "Område";
 
-/* Button title to cancel action in an alert */
+"BSB number" = "BSB-nummer";
+
+"Billing address is same as shipping" = "Fakturaadressa er den same som leveringsadressa";
+
 "Cancel" = "Avbryt";
 
-/* Caption for City field on address form */
 "City" = "Stad";
 
-/* Text for continue button */
-"Continue" = "Hald fram";
+"Code field" = "Kodefelt";
 
-/* Caption for Country field on address form */
+"Company" = "Selskap";
+
+"Continue" = "Fortsett";
+
 "Country" = "Land";
 
-/* Country selector and postal code entry form header title */
 "Country or region" = "Land eller region";
 
-/* Caption for County field on address form (only countries that use county, like United Kingdom) */
 "County" = "Fylke";
 
-/* Label of an address field */
-"Department" = "Avdeling";
+"Department" = "Område";
 
-/* Label for the district field on an address form */
 "District" = "Distrikt";
 
-/* Label of an address field */
 "Do Si" = "Do Si";
 
-/* Done button title */
 "Done" = "Ferdig";
 
-/* Label of an address field */
+"Double tap to edit" = "Dobbeltæpp for å redigere";
+
+"Edit" = "Rediger";
+
 "Eircode" = "Eircode";
 
-/* Caption for Email field on address form */
 "Email" = "E-post";
 
-/* Used to describe address in United Arab Emirates */
 "Emirate" = "Emirat";
 
-/* Label for first (given) name field */
+"Error" = "Feil";
+
 "First" = "Fornamn";
 
-/* Error description for incomplete phone number */
+"Full name" = "Fullt namn";
+
 "Incomplete phone number" = "Ufullstendig telefonnummer";
 
-/* Label for last (family) name field */
+"Invalid UPI ID" = "Ugyldig UPI ID";
+
+"Island" = "Øy";
+
 "Last" = "Etternamn";
 
-/* Form field header for entering a mobile phone number */
-"Mobile number" = "Mobilnummer";
-
-/* Caption for Name field on address form */
 "Name" = "Namn";
 
-/* No comment provided by engineer. */
+"Name on account" = "Namn på konto";
+
 "OK" = "OK";
 
-/* Label of an address field */
 "Oblast" = "Oblast";
 
-/* An option in a dropdown selector indicating the customer's desired selection is not in the list. e.g., 'Choose your bank: Bank1, Bank2, Other' */
 "Other" = "Annan";
 
-/* Label of an address field */
-"Parish" = "Prestegjeld";
+"Parish" = "Sogn";
 
-/* Caption for Phone field on address form */
 "Phone" = "Telefonnr.";
 
-/* Short string for postal code (text used in non-US countries) */
 "Postal code" = "Postnummer";
 
-/* Label of an address field */
 "Prefecture" = "Prefektur";
 
-/* Caption for Province field on address form (only countries that use province, like Canada) */
 "Province" = "Område";
 
-/* Caption for State field on address form (only countries that use state , like United States) */
-"State" = "Fylke";
+"Remove" = "Fjern";
 
-/* Label of an address field */
-"Suburb" = "Bydel";
+"Remove bank account" = "Fjern bankkonto";
 
-/* Label of an address field */
-"Suburb or city" = "Bydel eller stad";
+"Remove bank account ending in %@" = "Fjern bankkonto som sluttar på %@";
 
-/* An error message. */
+"Search" = "Søk";
+
+"State" = "Stat";
+
+"Suburb" = "Forstad";
+
+"Suburb or city" = "Forstad eller stad";
+
+"The BSB you entered is incomplete." = "BSB-koden du skreiv inn er ufullstendig.";
+
 "The ID number you entered is incomplete." = "ID-nummeret du skrev inn, er ufullstendig.";
 
-/* Label of an address field */
+"The account number you entered is incomplete." = "Kontonummeret du skrev inn, er ufullstendig.";
+
 "Town or city" = "Stad";
 
-/* Error string when we can't parse a phone number */
+"UPI ID" = "UPI ID";
+
 "Unable to parse phone number" = "Kan ikkje analysere telefonnummer";
 
-/* Error message when email is invalid */
+"Use rotor to access links" = "Bruk rotor for å opne koplingar";
+
+"Your ZIP is incomplete." = "ZIP-koden er ufullstendig.";
+
 "Your email is invalid." = "E-postadressa di er ugyldig.";
 
-/* Short string for zip code (United States only) Please keep to 5 characters or less if possible. */
-"ZIP" = "POSTNR.";
+"Your postal code is incomplete." = "Postnummeret er ufullstendig.";
 
+"ZIP" = "POSTNR.";

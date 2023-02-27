@@ -3,14 +3,19 @@
 //  StripeIdentityTests
 //
 //  Created by Mel Ludowise on 11/4/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
-import UIKit
 @_spi(STP) import StripeCore
+import UIKit
+import XCTest
+
 @testable import StripeIdentity
 
 final class IdentityAPIClientTestMock: IdentityAPIClient {
+
+    var apiVersion: Int = IdentityAPIClientImpl.productionApiVersion
 
     struct ImageUploadRequestParams {
         let image: UIImage
@@ -19,10 +24,12 @@ final class IdentityAPIClientTestMock: IdentityAPIClient {
         let fileName: String
     }
 
-    let verificationPage = MockAPIRequests<Void, VerificationPage>()
-    let verificationPageData = MockAPIRequests<VerificationPageDataUpdate, VerificationPageData>()
-    let verificationSessionSubmit = MockAPIRequests<Void, VerificationPageData>()
-    let imageUpload = MockAPIRequests<ImageUploadRequestParams, StripeFile>()
+    let verificationPage = MockAPIRequests<Void, StripeAPI.VerificationPage>()
+    let verificationPageData = MockAPIRequests<
+        StripeAPI.VerificationPageDataUpdate, StripeAPI.VerificationPageData
+    >()
+    let verificationSessionSubmit = MockAPIRequests<Void, StripeAPI.VerificationPageData>()
+    let imageUpload = MockAPIRequests<ImageUploadRequestParams, STPAPIClient.FileAndUploadMetrics>()
 
     var verificationSessionId: String
     var ephemeralKeySecret: String
@@ -35,17 +42,17 @@ final class IdentityAPIClientTestMock: IdentityAPIClient {
         self.ephemeralKeySecret = ephemeralKeySecret
     }
 
-    func getIdentityVerificationPage() -> Promise<VerificationPage> {
+    func getIdentityVerificationPage() -> Promise<StripeAPI.VerificationPage> {
         return verificationPage.makeRequest(with: ())
     }
 
     func updateIdentityVerificationPageData(
-        updating verificationData: VerificationPageDataUpdate
-    ) -> Promise<VerificationPageData> {
+        updating verificationData: StripeAPI.VerificationPageDataUpdate
+    ) -> Promise<StripeAPI.VerificationPageData> {
         return verificationPageData.makeRequest(with: verificationData)
     }
 
-    func submitIdentityVerificationPage() -> Promise<VerificationPageData> {
+    func submitIdentityVerificationPage() -> Promise<StripeAPI.VerificationPageData> {
         return verificationSessionSubmit.makeRequest(with: ())
     }
 
@@ -54,13 +61,45 @@ final class IdentityAPIClientTestMock: IdentityAPIClient {
         compressionQuality: CGFloat,
         purpose: String,
         fileName: String
-    ) -> Promise<StripeFile> {
-        return imageUpload.makeRequest(with: .init(
-            image: image,
-            compressionQuality: compressionQuality,
-            purpose: purpose,
-            fileName: fileName
-        ))
+    ) -> Future<STPAPIClient.FileAndUploadMetrics> {
+        return imageUpload.makeRequest(
+            with: .init(
+                image: image,
+                compressionQuality: compressionQuality,
+                purpose: purpose,
+                fileName: fileName
+            )
+        )
+    }
+
+    // Ensures `count` number of files are uploaded
+    func makeUploadRequestExpectations(
+        count: Int,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> [XCTestExpectation] {
+        var expectations: [XCTestExpectation] = []
+        expectations.reserveCapacity(count)
+        (1...count).forEach { expectations.append(.init(description: "Uploaded image \($0)")) }
+
+        var uploadCount = 0
+
+        self.imageUpload.callBackOnRequest {
+            // Increment uploadCount last
+            defer {
+                uploadCount += 1
+            }
+            guard uploadCount < count else {
+                return XCTFail(
+                    "Images were uploaded \(uploadCount+1) times. Only expected \(count) times.",
+                    file: file,
+                    line: line
+                )
+            }
+            expectations[uploadCount].fulfill()
+        }
+
+        return expectations
     }
 }
 

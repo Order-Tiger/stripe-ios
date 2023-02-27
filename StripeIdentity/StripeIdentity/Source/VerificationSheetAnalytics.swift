@@ -16,7 +16,7 @@ protocol VerificationSheetAnalytic: Analytic {
 }
 
 extension VerificationSheetAnalytic {
-    var params: [String : Any] {
+    var params: [String: Any] {
         var params = additionalParams
         params["verification_session"] = verificationSessionId
         return params
@@ -27,7 +27,7 @@ extension VerificationSheetAnalytic {
 struct VerificationSheetPresentedAnalytic: VerificationSheetAnalytic {
     let event = STPAnalyticEvent.verificationSheetPresented
     let verificationSessionId: String?
-    let additionalParams: [String : Any] = [:]
+    let additionalParams: [String: Any] = [:]
 }
 
 /// Logged when the sheet is closed by the end-user
@@ -36,9 +36,9 @@ struct VerificationSheetClosedAnalytic: VerificationSheetAnalytic {
     let verificationSessionId: String?
     let sessionResult: String
 
-    var additionalParams: [String : Any] {
+    var additionalParams: [String: Any] {
         return [
-            "session_result": sessionResult,
+            "session_result": sessionResult
         ]
     }
 }
@@ -47,8 +47,8 @@ struct VerificationSheetClosedAnalytic: VerificationSheetAnalytic {
 struct VerificationSheetFailedAnalytic: VerificationSheetAnalytic, ErrorAnalytic {
     let event = STPAnalyticEvent.verificationSheetFailed
     let verificationSessionId: String?
-    let additionalParams: [String : Any] = [:]
-    let error: AnalyticLoggableError
+    let additionalParams: [String: Any] = [:]
+    let error: Error
 }
 
 /// Helper to determine if we should log a failed analytic or closed analytic from the sheet's completion block
@@ -60,13 +60,19 @@ struct VerificationSheetCompletionAnalytic {
     ) -> VerificationSheetAnalytic {
         switch result {
         case .flowCompleted:
-            assert(verificationSessionId != nil, "Verification Session ID is nil with completed result.")
+            assert(
+                verificationSessionId != nil,
+                "Verification Session ID is nil with completed result."
+            )
             return VerificationSheetClosedAnalytic(
                 verificationSessionId: verificationSessionId,
                 sessionResult: "flow_completed"
             )
         case .flowCanceled:
-            assert(verificationSessionId != nil, "Verification Session ID is nil with canceled result.")
+            assert(
+                verificationSessionId != nil,
+                "Verification Session ID is nil with canceled result."
+            )
             return VerificationSheetClosedAnalytic(
                 verificationSessionId: verificationSessionId,
                 sessionResult: "flow_canceled"
@@ -74,7 +80,7 @@ struct VerificationSheetCompletionAnalytic {
         case .flowFailed(let error):
             return VerificationSheetFailedAnalytic(
                 verificationSessionId: verificationSessionId,
-                error: error as AnalyticLoggableError
+                error: error
             )
         }
     }

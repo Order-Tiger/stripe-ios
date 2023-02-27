@@ -7,7 +7,8 @@
 //
 
 @import Stripe;
-#import "Non_Card_Payment_Examples-Swift.h"
+@import StripeCore;
+#import "NonCardPaymentExamples-Swift.h"
 
 #import "BrowseExamplesViewController.h"
 
@@ -45,7 +46,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 21;
+    return 24;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -113,6 +114,15 @@
             break;
         case 20:
             cell.textLabel.text = @"Affirm (PaymentMethods)";
+            break;
+        case 21:
+            cell.textLabel.text = @"US Bank Account";
+            break;
+        case 22:
+            cell.textLabel.text = @"US Bank Account w/ FinancialConnections";
+            break;
+        case 23:
+            cell.textLabel.text = @"Cash App Pay";
             break;
     }
     return cell;
@@ -250,6 +260,24 @@
         }
         case 20: {
             AffirmExampleViewController *exampleVC = [AffirmExampleViewController new];
+            exampleVC.delegate = self;
+            viewController = exampleVC;
+            break;
+        }
+        case 21: {
+            USBankAccountExampleViewController *exampleVC = [USBankAccountExampleViewController new];
+            exampleVC.delegate = self;
+            viewController = exampleVC;
+            break;
+        }
+        case 22: {
+            USBankAccountFinancialConnectionsExampleViewController *exampleVC = [USBankAccountFinancialConnectionsExampleViewController new];
+            exampleVC.delegate = self;
+            viewController = exampleVC;
+            break;
+        }
+        case 23: {
+            CashAppExampleViewController *exampleVC = [CashAppExampleViewController new];
             exampleVC.delegate = self;
             viewController = exampleVC;
             break;

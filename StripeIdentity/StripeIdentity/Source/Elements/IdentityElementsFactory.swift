@@ -1,18 +1,17 @@
 //
-//  IndividualElementsFactory.swift
+//  IdentityElementsFactory.swift
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 9/23/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
-@_spi(STP) import StripeUICore
 @_spi(STP) import StripeCore
+@_spi(STP) import StripeUICore
 
-/**
- Factory to create form elements needed for the 'Individual' screen of the
- Identity flow where the user is asked to enter additional personal information.
- */
+/// Factory to create form elements needed for the 'Individual' screen of the
+/// Identity flow where the user is asked to enter additional personal information.
 struct IdentityElementsFactory {
 
     struct IDNumberSpec {
@@ -23,73 +22,71 @@ struct IdentityElementsFactory {
     let locale: Locale
     let addressSpecProvider: AddressSpecProvider
 
-    init(locale: Locale = .current,
-         addressSpecProvider: AddressSpecProvider = .shared) {
+    let dateFormatter: DateFormatter
+
+    static let supportedCountryToIDNumberTypes: [String: IdentityElementsFactory.IDNumberSpec] = [
+        "US": .init(type: .US_SSN_LAST4, label: "Last 4 of Social Security number"),
+        "BR": .init(type: .BR_CPF, label: "Individual CPF"),
+        "SG": .init(type: .SG_NRIC_OR_FIN, label: "NRIC or FIN"),
+    ]
+
+    init(
+        locale: Locale = .current,
+        addressSpecProvider: AddressSpecProvider = .shared
+    ) {
         self.locale = locale
         self.addressSpecProvider = addressSpecProvider
+
+        self.dateFormatter = DateFormatter()
+        self.dateFormatter.dateFormat = "MM / dd / yyyy"
     }
 
     // MARK: Name
 
     func makeNameSection() -> SectionElement {
-        typealias NameConfiguration = TextFieldElement.Address.NameConfiguration
-        
-        return SectionElement(title: String.Localized.name, elements: [
-            TextFieldElement(configuration: NameConfiguration(type: .given, defaultValue: nil)),
-            TextFieldElement(configuration: NameConfiguration(type: .family, defaultValue: nil)),
-        ])
+        typealias NameConfiguration = TextFieldElement.NameConfiguration
+
+        return SectionElement(
+            title: String.Localized.name,
+            elements: [
+                TextFieldElement(configuration: NameConfiguration(type: .given, defaultValue: nil)),
+                TextFieldElement(
+                    configuration: NameConfiguration(type: .family, defaultValue: nil)
+                ),
+            ]
+        )
     }
 
     // MARK: ID Number
 
-    /**
-     Creates a section with a country dropdown and ID number input.
-     - Parameters:
-       - countryToIDNumberTypes: Map of accepted country codes which we can accept ID numbers from to the ID type.
-     */
-    func makeIDNumberSection(countryToIDNumberTypes: [String: IDNumberSpec]) -> SectionElement? {
+    /// Creates a section with a country dropdown and ID number input.
+    /// - Parameters:
+    ///   - idNumberCountires: Array of accepted country codes which we can accept ID numbers from to the ID type.
+    func makeIDNumberSection(idNumberCountries: [String]) -> IdNumberElement? {
+        let countryToIDNumberTypes = IdentityElementsFactory.supportedCountryToIDNumberTypes.filter(
+            { idNumberCountries.contains($0.key) }
+        )
         guard !countryToIDNumberTypes.isEmpty else {
             return nil
         }
 
-        // TODO(mludowise|IDPROD-2543): We'll need to tweak this to better
-        // handle unsupported countries.
-
-        let sortedCountryCodes = locale.sortedByTheirLocalizedNames(
-            Array(countryToIDNumberTypes.keys),
-            thisRegionFirst: true
-        )
-
-        let country = DropdownFieldElement.Address.makeCountry(
-            label: String.Localized.country,
-            countryCodes: sortedCountryCodes,
-            locale: locale
-        )
-
-        let defaultCountrySpec = countryToIDNumberTypes[sortedCountryCodes[country.selectedIndex]]
-        let id = TextFieldElement(configuration: IDNumberTextFieldConfiguration(spec: defaultCountrySpec))
-        let section = SectionElement(
-            title: String.Localized.id_number_title,
-            elements: [country, id]
-        )
-
-        // Change ID input based on country selection
-        country.didUpdate = { index in
-            let selectedCountryCode = sortedCountryCodes[index]
-            let id = TextFieldElement(configuration: IDNumberTextFieldConfiguration(spec: countryToIDNumberTypes[selectedCountryCode]))
-            section.elements = [country, id]
-        }
-
-        return section
+        return IdNumberElement(countryToIDNumberTypes: countryToIDNumberTypes, locale: locale)
     }
 
     // MARK: DOB
 
-    func makeDateOfBirth() -> DateFieldElement {
-        return DateFieldElement(
-            label: String.Localized.date_of_birth,
-            maximumDate: Date(),
-            locale: locale)
+    func makeDateOfBirthSection() -> SectionElement {
+        return  SectionElement(
+            title: String.Localized.date_of_birth,
+            elements: [DateFieldElement(
+                label: "MM / DD / YYYY",
+                minimumDate: dateFormatter.date(from: "01 / 01 / 1990"),
+                maximumDate: Date(),
+                locale: locale,
+                customDateFormatter: dateFormatter
+                ),
+            ]
+        )
     }
 
     // MARK: Address
@@ -105,7 +102,9 @@ struct IdentityElementsFactory {
 }
 
 extension IDNumberTextFieldConfiguration {
-    init(spec: IdentityElementsFactory.IDNumberSpec?) {
+    init(
+        spec: IdentityElementsFactory.IDNumberSpec?
+    ) {
         self.init(
             type: spec?.type,
             label: spec?.label ?? String.Localized.personal_id_number

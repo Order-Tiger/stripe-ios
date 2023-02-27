@@ -21,29 +21,38 @@ import UIKit
      - Note: This is set by your parent.
      */
     var delegate: ElementDelegate? { get set }
-    
+
     /**
      Return your UIView instance.
      */
     var view: UIView { get }
-    
+
     /**
-     - Returns: Whether or not this object is now the first-responder.
+     - Returns: Whether or not this Element began editing.
      */
-    func becomeResponder() -> Bool
-    
+    func beginEditing() -> Bool
+
     /**
-     The error text to display to the user, if any.
+     Whether this element contains valid user input or not.
      */
-    var errorText: String? { get }
+    var validationState: ElementValidationState { get }
+
+    /**
+     Text to display to the user under the item, if any.
+     */
+    var subLabelText: String? { get }
 }
 
 public extension Element {
-    func becomeResponder() -> Bool {
-        return view.becomeFirstResponder()
+    func beginEditing() -> Bool {
+        return false
     }
-    
-    var errorText: String? {
+
+    var validationState: ElementValidationState {
+        return .valid
+    }
+
+    var subLabelText: String? {
         return nil
     }
 }
@@ -56,25 +65,52 @@ public extension Element {
 @_spi(STP) public protocol ElementDelegate: AnyObject {
     /**
      This method is called whenever your public/internally visable state changes.
+     Note for implementors: Be sure to chain this call upwards to your own ElementDelegate.
      */
     func didUpdate(element: Element)
-    
+
     /**
      This method is called when the user finishes editing the caller e.g., by pressing the 'return' key.
+     Note for implementors: Be sure to chain this call upwards to your own ElementDelegate.
      */
-    func didFinishEditing(element: Element)
+    func continueToNextField(element: Element)
+}
+
+/**
+  An Element uses this delegate to present a view controller
+ */
+@_spi(STP) public protocol PresentingViewControllerDelegate: ElementDelegate {
+    /**
+     Elements will call this function to delegate presentation of a view controller
+     */
+    func presentViewController(viewController: UIViewController, completion: (() -> Void)?)
 }
 
 extension Element {
     /// A poorly named convenience method that returns all Elements underneath this Element, including this Element.
-    func getAllSubElements() -> [Element] {
+    public func getAllSubElements() -> [Element] {
         switch self {
-        case let form as FormElement:
-            return [form] + form.elements.flatMap { $0.getAllSubElements() }
-        case let section as SectionElement:
-            return [section] + section.elements.flatMap { $0.getAllSubElements() }
+        case let container as ContainerElement:
+            return [container] + container.elements.flatMap { $0.getAllSubElements() }
         default:
             return [self]
         }
     }
+}
+
+@_spi(STP) @frozen public enum ElementValidationState {
+    case valid
+    case invalid(error: ElementValidationError, shouldDisplay: Bool)
+
+    /// A convenience property to check if the state is valid because it's hard to make this type Equatable
+    public var isValid: Bool {
+        if case .valid = self {
+            return true
+        }
+        return false
+    }
+}
+
+@_spi(STP) public protocol ElementValidationError: Error {
+    var localizedDescription: String { get }
 }

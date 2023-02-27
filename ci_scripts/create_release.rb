@@ -6,10 +6,12 @@ require_relative 'release_common'
 @version = @specified_version
 
 # If no argument, exit
-abort('Specify a version number. (e.g. `ci_scripts/propose.rb 21.0.0`)') if @version.nil?
+abort("Specify a version number. (e.g. `#{__FILE__} --version 21.0.0`)") if @version.nil?
 
 # Make sure version is a valid version number
-abort('Version number must be in the format `x.x.x`, e.g. `ci_scripts/propose.rb 21.0.0`') unless @version.match(/^[0-9]+\.[0-9]+\.[0-9]+$/)
+unless @version.match(/^[0-9]+\.[0-9]+\.[0-9]+$/)
+  abort('Version number must be in the format `x.x.x`, e.g. `ci_scripts/propose.rb 21.0.0`')
+end
 
 puts "Proposing version: #{@version}".red
 
@@ -18,6 +20,17 @@ puts "Proposing version: #{@version}".red
 
 def create_branch
   run_command("git checkout -b #{@branchname}")
+end
+
+def regenerate_project_files
+  run_command('ci_scripts/delete_project_files.rb')
+  puts 'Generating project files'
+  run_command('tuist generate -n')
+  # Delete xcuserdatad folders.
+  puts "Deleting user data files"
+  run_command('find Stripe* -type d -name "*.xcuserdatad" -exec rm -r {} +', false)
+  run_command('find Example* -type d -name "*.xcuserdatad" -exec rm -r {} +', false)
+  run_command('find Testers* -type d -name "*.xcuserdatad" -exec rm -r {} +', false)
 end
 
 def update_version
@@ -36,18 +49,17 @@ def update_placeholders
   update_placeholder(@version, 'MIGRATING.md')
 end
 
-def build_documentation
-  # Rebuild documentation
-  run_command('ci_scripts/build_documentation.rb')
-end
-
-def pod_lint
-  pod_lint_common
-end
-
 def commit_changes
   # Commit and push the changes
-  run_command("git commit -am \"Update version to #{@version}\"")
+  # Xcode project files are added to ensure compatibility with Carthage,
+  # -f is used because this files are included in .gitignore.
+  # Manually add the docs directory to pick up any new docs files generated as part of release
+  run_command("git add Stripe.xcworkspace -f &&
+    git add Stripe*/*.xcodeproj -f &&
+    git add Example/**/*.xcodeproj -f &&
+    git add Testers/**/*.xcodeproj -f &&
+    git add -u &&
+    git commit -m \"Update version to #{@version}\"")
 end
 
 def push_changes
@@ -57,19 +69,19 @@ end
 def create_pr
   # Create a new pull request from the branch
   pr_body = %{
-  - [ ] Verify CHANGELOG is updated with any new features or breaking changes (be thorough when reviewing commit history) 
+  - [ ] Verify CHANGELOG is updated with any new features or breaking changes (be thorough when reviewing commit history)
   - [ ] Verify MIGRATING is updated (if necessary).
   - [ ] Verify the following files are updated to use the new version string:
     - [ ] Version.xcconfig
     - [ ] All *.podspec files
     - [ ] StripeAPIConfiguration+Version.swift
-  - [ ] If new directories were added, verify they have been added to the appropriate `*.podspec` "files" section and re-run `pod lib lint`.
+  - [ ] If new directories were added, verify they have been added to the appropriate `*.podspec` "files" section.
   }
 
   unless @is_dry_run
     pr = @github_client.create_pull_request(
-      'stripe-ios/stripe-ios',
-      'private',
+      'stripe/stripe-ios',
+      'master',
       @branchname,
       "Release version #{@version}",
       pr_body
@@ -79,7 +91,7 @@ end
 
 def check_for_missing_localizations
   # Check for missing localizations (we do this last to batch all the interactive parts to the end)
-  missing_localizations = `ci_scripts/check_for_missing_localizations.sh`
+  missing_localizations = `ci_scripts/l10n/check_for_missing_localizations.rb`
   # Output the result of the check
   if $?.exitstatus != 0
     puts missing_localizations
@@ -92,37 +104,33 @@ end
 
 def propose_release
   unless @is_dry_run
-    all_prs = @github_client.pull_requests('stripe-ios/stripe-ios', :state => 'open')
+    # Lookup PR
+    all_prs = @github_client.pull_requests('stripe/stripe-ios', state: 'open')
     pr = all_prs.find { |pr| pr.head.ref == @branchname }
-    rputs "Complete the pull request checklist at #{pr.html_url}, then run `propose_release.rb`"
+
+    # Get list of new directories and save to a temp file
+    prev_release_tag = @github_client.latest_release('stripe/stripe-ios').tag_name
+    `git fetch origin --tags`
+    new_dirs = `ci_scripts/check_for_new_directories.sh HEAD #{prev_release_tag}`
+    temp_dir = `mktemp -d`.chomp("\n")
+    new_dir_file = File.join_if_safe(temp_dir, "new_directories_#{@version}.txt")
+    File.open(new_dir_file, 'w') { |file| file.puts new_dirs }
+
+    rputs "Complete the pull request checklist at #{pr.html_url} and the above docs PR, then run `bundle exec ruby ci_scripts/propose_release.rb`"
+    rputs "For a list of new directories since tag #{prev_release_tag}, `cat #{new_dir_file}`"
     notify_user
   end
 end
 
 steps = [
   method(:create_branch),
+  method(:regenerate_project_files),
   method(:update_version),
   method(:update_placeholders),
-  method(:build_documentation),
-  method(:pod_lint),
   method(:commit_changes),
   method(:push_changes),
   method(:create_pr),
   method(:check_for_missing_localizations),
   method(:propose_release)
 ]
-if @step_index > 0
-  steps = steps.drop(@step_index)
-  rputs "Continuing from step #{@step_index}: #{steps.first.name}"
-end
-
-begin
-  steps.each do |step|
-    rputs "# #{step.name} (step #{@step_index + 1}/#{steps.length})"
-    step.call
-    @step_index += 1
-  end
-rescue Exception => e
-  rputs "Restart with --continue-from #{@step_index} to re-run from this step."
-  raise
-end
+execute_steps(steps, @step_index)

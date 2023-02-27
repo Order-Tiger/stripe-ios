@@ -8,14 +8,16 @@
 import Foundation
 @_spi(STP) import StripeCore
 
+extension StripeAPI {
 
+    struct VerificationPageStaticContentConsentPage: Decodable, Equatable {
+        let acceptButtonText: String
+        let body: String
+        let declineButtonText: String
+        let privacyPolicy: String
+        let timeEstimate: String
+        let title: String
+        let scrollToContinueButtonText: String
+    }
 
-struct VerificationPageStaticContentConsentPage: StripeDecodable, Equatable {
-    let acceptButtonText: String
-    let body: String
-    let declineButtonText: String
-    let privacyPolicy: String
-    let timeEstimate: String
-    let title: String
-    var _allResponseFieldsStorage: NonEncodableParameters?
 }

@@ -3,14 +3,15 @@
 //  StripeUICoreTests
 //
 //  Created by Mel Ludowise on 10/8/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import XCTest
 @_spi(STP) @testable import StripeUICore
+import XCTest
 
 final class DropdownFieldElementTest: XCTestCase {
 
-    let items = ["A", "B", "C", "D"]
+    let items = ["A", "B", "C", "D"].map { DropdownFieldElement.DropdownItem(pickerDisplayName: $0, labelDisplayName: $0, accessibilityValue: $0, rawData: $0) }
 
     func testNoDefault() {
         let element = DropdownFieldElement(items: items, label: "")
@@ -30,6 +31,16 @@ final class DropdownFieldElementTest: XCTestCase {
     func testDefaultExceedsMin() {
         let element = DropdownFieldElement(items: items, defaultIndex: -1, label: "")
         XCTAssertEqual(element.selectedIndex, 0)
+    }
+
+    func testDisableDropdownWithSingleElement() {
+        let multipleElements = DropdownFieldElement(items: items, defaultIndex: -1, label: "", disableDropdownWithSingleElement: true)
+
+        XCTAssertEqual(multipleElements.pickerFieldView.isUserInteractionEnabled, true)
+
+        let singleElement = DropdownFieldElement(items: [DropdownFieldElement.DropdownItem(pickerDisplayName: "Item", labelDisplayName: "Item", accessibilityValue: "Item", rawData: "Item")], defaultIndex: -1, label: "", disableDropdownWithSingleElement: true)
+
+        XCTAssertEqual(singleElement.pickerFieldView.isUserInteractionEnabled, false)
     }
 
     func testDidUpdate() {

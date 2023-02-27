@@ -1,6 +1,6 @@
 //
 //  PaymentMethod.swift
-//  StripeiOS
+//  StripeApplePay
 //
 //  Created by David Estes on 6/29/21.
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
@@ -12,21 +12,21 @@ import Foundation
 extension StripeAPI {
     /// PaymentMethod objects represent your customer's payment instruments. They can be used with PaymentIntents to collect payments.
     /// - seealso: https://stripe.com/docs/api/payment_methods
-    public struct PaymentMethod: StripeDecodable {
+    public struct PaymentMethod: UnknownFieldsDecodable {
         /// The Stripe ID of the PaymentMethod.
         public let id: String
-        
+
         /// Time at which the object was created. Measured in seconds since the Unix epoch.
         public var created: Date?
         /// `YES` if the object exists in live mode or the value `NO` if the object exists in test mode.
         public var livemode = false
-        
+
         /// The type of the PaymentMethod.  The corresponding, similarly named property contains additional information specific to the PaymentMethod type.
         /// e.g. if the type is `Card`, the `card` property is also populated.
         public var type: PaymentMethodType?
-        
+
         /// The type of the PaymentMethod.
-        @frozen public enum PaymentMethodType: String, StripeEnumCodable {
+        @frozen public enum PaymentMethodType: String, SafeEnumCodable {
             /// A card payment method.
             case card
             /// An unknown type.
@@ -37,21 +37,20 @@ extension StripeAPI {
         }
 
         /// Billing information associated with the PaymentMethod that may be used or required by particular types of payment methods.
-        @IncludeUnknownFields
         public var billingDetails: BillingDetails?
         /// The ID of the Customer to which this PaymentMethod is saved. Nil when the PaymentMethod has not been saved to a Customer.
         public var customerId: String?
         /// If this is a card PaymentMethod (ie `self.type == .card`), this contains additional details.
-        @IncludeUnknownFields
         public var card: Card?
-        
-        public struct Card: StripeDecodable {
+
+        /// :nodoc:
+        public struct Card: UnknownFieldsDecodable {
             public var _allResponseFieldsStorage: NonEncodableParameters?
             /// The issuer of the card.
             public private(set) var brand: Brand = .unknown
-            
+
             /// The various card brands to which a payment card can belong.
-            @frozen public enum Brand: String, StripeEnumCodable {
+            @frozen public enum Brand: String, SafeEnumCodable {
                 /// Visa
                 case visa
                 /// American Express
@@ -86,18 +85,16 @@ extension StripeAPI {
             /// Uniquely identifies this particular card number. You can use this attribute to check whether two customers who’ve signed up with you are using the same card number, for example.
             public private(set) var fingerprint: String?
 
-            @IncludeUnknownFields
             /// Contains information about card networks that can be used to process the payment.
             public private(set) var networks: Networks?
 
-            @IncludeUnknownFields
             /// Contains details on how this Card maybe be used for 3D Secure authentication.
             public private(set) var threeDSecureUsage: ThreeDSecureUsage?
-            
+
             /// If this Card is part of a Card Wallet, this contains the details of the Card Wallet.
             public private(set) var wallet: Wallet?
 
-            public struct Networks: StripeDecodable {
+            public struct Networks: UnknownFieldsDecodable {
                 public var _allResponseFieldsStorage: NonEncodableParameters?
 
                 /// All available networks for the card.
@@ -105,16 +102,16 @@ extension StripeAPI {
                 /// The preferred network for the card if one exists.
                 public private(set) var preferred: String?
             }
-            
+
             /// Contains details on how a `Card` may be used for 3D Secure authentication.
-            public struct ThreeDSecureUsage: StripeDecodable {
+            public struct ThreeDSecureUsage: UnknownFieldsDecodable {
                 public var _allResponseFieldsStorage: NonEncodableParameters?
-                
+
                 /// `true` if 3D Secure is supported on this card.
                 public private(set) var supported = false
             }
-            
-            public struct Wallet: StripeDecodable {
+
+            public struct Wallet: UnknownFieldsDecodable {
                 public var _allResponseFieldsStorage: NonEncodableParameters?
                 /// The type of the Card Wallet. A matching property is populated if the type is `.masterpass` or `.visaCheckout` containing additional information specific to the Card Wallet type.
                 public private(set) var type: WalletType = .unknown
@@ -122,9 +119,9 @@ extension StripeAPI {
                 public private(set) var masterpass: Masterpass?
                 /// Contains additional Visa Checkout information, if the type of the Card Wallet is `STPPaymentMethodCardWalletTypeVisaCheckout`
                 public private(set) var visaCheckout: VisaCheckout?
-                
+
                 /// The type of Card Wallet.
-                @frozen public enum WalletType: String, StripeEnumCodable {
+                @frozen public enum WalletType: String, SafeEnumCodable {
                     /// Amex Express Checkout
                     case amexExpressCheckout = "amex_express_checkout"
                     /// Apple Pay
@@ -143,10 +140,10 @@ extension StripeAPI {
                     // TODO: This is @frozen because of a bug in the Xcode 12.2 Swift compiler.
                     // Remove @frozen after Xcode 12.2 support has been dropped.
                 }
-                
-                public struct Masterpass: StripeDecodable {
+
+                public struct Masterpass: UnknownFieldsDecodable {
                     public var _allResponseFieldsStorage: NonEncodableParameters?
-                    
+
                     /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
                     public private(set) var email: String?
                     /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
@@ -156,10 +153,10 @@ extension StripeAPI {
                     /// Owner’s verified shipping address. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
                     public private(set) var shippingAddress: BillingDetails.Address?
                 }
-                
+
                 /// A Visa Checkout Card Wallet
                 /// - seealso: https://stripe.com/docs/visa-checkout
-                public struct VisaCheckout: StripeDecodable {
+                public struct VisaCheckout: UnknownFieldsDecodable {
                     /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
                     public private(set) var email: String?
                     /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
@@ -173,8 +170,7 @@ extension StripeAPI {
                 }
             }
         }
-        
+
         public var _allResponseFieldsStorage: NonEncodableParameters?
     }
 }
-

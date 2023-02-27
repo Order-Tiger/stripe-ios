@@ -13,13 +13,13 @@
     public private(set) var productUsage: Set<String> = []
     public private(set) var loggedAnalytics: [Analytic] = []
 
-    public init() { }
+    public init() {}
 
-    public func addClass<T>(toProductUsageIfNecessary klass: T.Type) where T : STPAnalyticsProtocol {
+    public func addClass<T>(toProductUsageIfNecessary klass: T.Type) where T: STPAnalyticsProtocol {
         productUsage.insert(klass.stp_analyticsIdentifier)
     }
 
-    public func log(analytic: Analytic) {
+    public func log(analytic: Analytic, apiClient: STPAPIClient = .shared) {
         loggedAnalytics.append(analytic)
     }
 

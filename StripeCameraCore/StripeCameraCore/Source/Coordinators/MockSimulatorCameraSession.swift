@@ -3,17 +3,20 @@
 //  StripeCameraCore
 //
 //  Created by Mel Ludowise on 1/21/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
+
+// Ignoring file formatt becase of compiler directive which would force the whole file to be
+// indented, including import statements.
+// swift-format-ignore-file
 
 #if targetEnvironment(simulator)
 
-import Foundation
 import AVKit
+import Foundation
 @_spi(STP) import StripeCore
 
-/**
- Mocks a CameraSession on the simulator.
- */
+/// Mocks a CameraSession on the simulator.
 @_spi(STP) public final class MockSimulatorCameraSession: CameraSessionProtocol {
 
     enum Error: Swift.Error {
@@ -28,13 +31,17 @@ import AVKit
     private var currentImage: UIImage?
     private let sessionQueue = DispatchQueue(label: "com.stripe.mock-simulator-camera-session")
     private let videoOutput = AVCaptureVideoDataOutput()
-    private lazy var captureConnection = AVCaptureConnection(inputPorts: [], output: videoOutput)
+    private lazy var captureConnection = AVCaptureConnection(
+        inputPorts: [],
+        output: videoOutput
+    )
     private var mockSampleBufferTimer: Timer?
     weak private var delegate: AVCaptureVideoDataOutputSampleBufferDelegate?
 
     // MARK: - Public
 
     private var isConfigured: Bool = false
+    private var cameraPosition: CameraSession.CameraPosition = .front
 
     public weak var previewView: CameraPreviewView? {
         didSet {
@@ -42,7 +49,9 @@ import AVKit
         }
     }
 
-    public init(images: [UIImage]) {
+    public init(
+        images: [UIImage]
+    ) {
         self.images = images
     }
 
@@ -68,6 +77,7 @@ import AVKit
                 return
             }
 
+            self.cameraPosition = configuration.initialCameraPosition
             self.isConfigured = true
             wrappedCompletion(.success)
         }
@@ -96,13 +106,14 @@ import AVKit
                 return
             }
 
+            self.cameraPosition = position
             wrappedCompletion(.success)
         }
     }
 
     public func getCameraProperties() -> CameraSession.DeviceProperties? {
         return .init(
-            exposureDuration: CMTime(),
+            exposureDuration: CMTime(value: 0, timescale: 1),
             cameraDeviceType: .builtInDualCamera,
             isVirtualDevice: nil,
             lensPosition: 0,
@@ -146,9 +157,18 @@ import AVKit
         }
     }
 
-    public func stopSession() {
+    public func stopSession(
+        completeOn queue: DispatchQueue,
+        completion: @escaping () -> Void
+    ) {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
+
+            defer {
+                queue.async {
+                    completion()
+                }
+            }
 
             self.mockSampleBufferTimer?.invalidate()
 
@@ -160,12 +180,24 @@ import AVKit
     }
 }
 
-private extension MockSimulatorCameraSession {
-    @objc func mockSampleBufferDelegateCallback() {
+extension MockSimulatorCameraSession {
+    @objc fileprivate func mockSampleBufferDelegateCallback() {
         sessionQueue.async { [weak self] in
             guard let self = self,
-                  let sampleBuffer = self.currentImage?.convertToSampleBuffer() else {
-                    return
+                var image = self.currentImage
+            else {
+                return
+            }
+
+            // Flip image horizontally if mocking front-facing camera
+            if self.cameraPosition == .front,
+                let cgImage = image.cgImage
+            {
+                image = UIImage(cgImage: cgImage, scale: image.scale, orientation: .upMirrored)
+            }
+
+            guard let sampleBuffer = image.convertToSampleBuffer() else {
+                return
             }
 
             self.delegate?.captureOutput?(
@@ -176,7 +208,7 @@ private extension MockSimulatorCameraSession {
         }
     }
 
-    func setPreviewViewToCurrentImage() {
+    fileprivate func setPreviewViewToCurrentImage() {
         DispatchQueue.main.async { [weak self, weak currentImage] in
             guard let self = self else { return }
             self.previewView?.layer.contents = currentImage?.cgImage

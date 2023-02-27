@@ -1,5 +1,5 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 struct Torch {
     enum State {
@@ -10,8 +10,10 @@ struct Torch {
     var state: State
     var lastStateChange: Date
     var level: Float
-    
-    init(device: AVCaptureDevice) {
+
+    init(
+        device: AVCaptureDevice
+    ) {
         self.state = .off
         self.lastStateChange = Date()
         if device.hasTorch {
@@ -23,7 +25,7 @@ struct Torch {
         self.level = 1.0
     }
 
-    ///TODO(jaimepark): Refactor
+    /// TODO(jaimepark): Refactor
     mutating func toggle() {
         self.state = self.state == .on ? .off : .on
         do {
@@ -42,5 +44,5 @@ struct Torch {
             // no-op
         }
     }
-    
+
 }

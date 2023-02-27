@@ -8,19 +8,20 @@
 import Foundation
 @_spi(STP) import StripeCore
 
+extension StripeAPI {
 
-/** VerificationPageData contains the state of a verification, including what information needs to be collected to complete the verification flow. */
+    /// VerificationPageData contains the state of a verification, including what information needs to be collected to complete the verification flow.
 
-struct VerificationPageData: StripeDecodable, Equatable {
-    typealias Status = VerificationPage.Status
+    struct VerificationPageData: Decodable, Equatable {
+        typealias Status = VerificationPage.Status
 
-    /** Unique identifier for the object. */
-    let id: String
-    let requirements: VerificationPageDataRequirements
-    /** Status of the associated VerificationSession. */
-    let status: Status
-    /** If true, the associated VerificationSession has been submitted for processing. */
-    let submitted: Bool
+        /// Unique identifier for the object.
+        let id: String
+        let requirements: VerificationPageDataRequirements
+        /// Status of the associated VerificationSession.
+        let status: Status
+        /// If true, the associated VerificationSession has been submitted for processing.
+        let submitted: Bool
+    }
 
-    var _allResponseFieldsStorage: NonEncodableParameters?
 }

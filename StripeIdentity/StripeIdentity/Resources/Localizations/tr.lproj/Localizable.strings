@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Kimlik belgenizin fotoğrafını manuel olarak da yükleyebilirsiniz.";
+
 "App Settings" = "Uygulama Ayarları";
 
-/* Description of back of driver's license image */
-"Back of driver's license" = "Sürücü belgesinin arkası";
+"Back driver's license photo successfully uploaded" = "Sürücü belgesinin arka yüz fotoğrafı başarıyla yüklendi";
 
-/* Description of back of identity card image */
-"Back of identity card" = "Kimlik kartının arkası";
+"Back identity card photo successfully uploaded" = "Kimliğin arka yüz fotoğrafı başarıyla yüklendi";
 
-/* Title displayed when requesting camera permissions */
+"Back of driver's license" = "Sürücü belgesinin arka yüzü";
+
+"Back of identity card" = "Kimliğin arka yüzü";
+
 "Camera permission" = "Kamera izni";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Kamera kullanılamıyor";
+
+"Capturing…" = "Çekiliyor...";
+
 "Choose File" = "Dosya Seç";
 
-/* Label for Date of birth field */
+"Consent" = "Onay";
+
+"Could not capture image" = "Fotoğraf alınamadı";
+
 "Date of birth" = "Doğum tarihi";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Sürücü belgesi";
+"File Upload" = "Dosya Yükle";
 
-/* Title of identity document file upload screen */
 "File upload" = "Dosya yükle";
 
-/* Description of front of driver's license image */
-"Front of driver's license" = "Sürücü belgesinin önü";
+"Flip your driver's license over to the other side" = "Sürücü belgenizin diğer yüzünü çevirin";
 
-/* Description of front of identity card image */
-"Front of identity card" = "Kimlik kartının önü";
+"Flip your identity card over to the other side" = "Kimliğinizin diğer yüzünü çevirin";
 
-/* Label for ID number section */
+"Front driver's license photo successfully uploaded" = "Sürücü belgesinin ön yüz fotoğrafı başarıyla yüklendi";
+
+"Front identity card photo successfully uploaded" = "Kimliğin ön yüz fotoğrafı başarıyla yüklendi";
+
+"Front of driver's license" = "Sürücü belgesinin ön yüzü";
+
+"Front of identity card" = "Kimliğin ön yüzü";
+
+"Go Back" = "Geri Git";
+
+"Hold still, scanning" = "Bekleyin, taranıyor";
+
 "ID Number" = "Kimlik Numarası";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Kimlik kartı";
+"ID Type" = "Kimlik Belgesi Türü";
 
-/* Description of passport image */
 "Image of passport" = "Pasaport fotoğrafı";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Yükleniyor";
+
 "Passport" = "Pasaport";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Pasaport fotoğrafı başarıyla yüklendi";
+
 "Personal ID number" = "Kişisel kimlik numarası";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Fotoğraf Kitaplığı";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Lütfen pasaportunuzun bir fotoğrafını yükleyin";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Lütfen sürücü belgenizin ön ve arka yüzünün fotoğraflarını yükleyin";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Lütfen kimlik belgenizin ön ve arka yüzlerinin fotoğraflarını yükleyin";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Sürücü belgenizi çerçevenin ortasına yerleştirin";
+
+"Position your face in the center of the frame." = "Yüzünüzü çerçevenin ortasına yerleştirin.";
+
+"Position your identity card in the center of the frame" = "Kimliğinizi çerçevenin ortasına yerleştirin";
+
+"Position your passport in the center of the frame" = "Pasaportunuzu çerçevenin ortasına yerleştirin";
+
+"Scan" = "Tara";
+
+"Scanned" = "Tarandı";
+
 "Select" = "Seç";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Kimlik belgenizin arka yüzünü yükleyeceğiniz konumu seçin";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Kimlik belgenizin ön yüzünü yükleyeceğiniz konumu seçin";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Sürücü belgesinin arka yüz fotoğrafını seç";
+
+"Select back identity card photo" = "Kimliğin arka yüz fotoğrafını seç";
+
+"Select front driver's license photo" = "Sürücü belgesinin ön yüz fotoğrafını seç";
+
+"Select front identity card photo" = "Kimliğin ön yüz fotoğrafını seç";
+
+"Select passport photo" = "Pasaport fotoğrafı seç";
+
+"Selfie" = "Özçekim";
+
+"Selfie captures" = "Özçekim çekimleri";
+
+"Selfie captures are complete" = "Özçekim çekimleri tamamlandı";
+
 "Take Photo" = "Fotoğraf Çek";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Tekrar dene";
+"The images of your identity document have not been saved. Do you want to leave?" = "Kimlik belgenizin fotoğrafları kaydedilmedi. Ayrılmak istiyor musunuz?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "Kameraya erişilirken bir hata oluştu.";
+
+"Try Again" = "Tekrar Dene";
+
 "Unable to establish a connection." = "Bağlantı kurulamıyor.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Kaydedilmemiş değişiklikler";
+
 "Upload" = "Yükle";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Fotoğraf Yükle";
+
+"Uploading back driver's license photo" = "Sürücü belgesinin arka yüz fotoğrafı yükleniyor";
+
+"Uploading back identity card photo" = "Kimliğin arka yüz fotoğrafı yükleniyor";
+
+"Uploading front driver's license photo" = "Sürücü belgesinin ön yüz fotoğrafı yükleniyor";
+
+"Uploading front identity card photo" = "Kimliğin ön yüz fotoğrafı yükleniyor";
+
+"Uploading passport photo" = "Pasaport fotoğrafı yükleniyor";
+
 "Verify your identity" = "Kimliğinizi doğrulayın";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Yüksek kaliteli bir fotoğraf yakalayamadık.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Kameranızı kullanmamız için izniniz gerekiyor. Lütfen uygulama ayarlarından kamera erişimine izin verin.";
 
+"You can either try again or upload an image from your device." = "Tekrar deneyebilir veya cihazınızdan bir fotoğraf yükleyebilirsiniz.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Özçekim görüntüleriniz kaydedilmedi. Çıkmak istiyor musunuz?";

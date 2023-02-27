@@ -3,15 +3,23 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 10/29/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
-@_spi(STP) import StripeCore
+import SafariServices
 @_spi(STP) import StripeCameraCore
+@_spi(STP) import StripeCore
+import UIKit
 
 protocol VerificationSheetFlowControllerDelegate: AnyObject {
     /// Invoked when the user has dismissed the navigation controller
-    func verificationSheetFlowControllerDidDismiss(_ flowController: VerificationSheetFlowControllerProtocol)
+    func verificationSheetFlowControllerDidDismissNativeView(
+        _ flowController: VerificationSheetFlowControllerProtocol
+    )
+
+    func verificationSheetFlowControllerDidDismissWebView(
+        _ flowController: VerificationSheetFlowControllerProtocol
+    )
 }
 
 protocol VerificationSheetFlowControllerProtocol: AnyObject {
@@ -20,39 +28,58 @@ protocol VerificationSheetFlowControllerProtocol: AnyObject {
     var navigationController: UINavigationController { get }
 
     func transitionToNextScreen(
-        apiContent: VerificationSheetAPIContent,
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        updateDataResult: Result<StripeAPI.VerificationPageData, Error>?,
         sheetController: VerificationSheetControllerProtocol,
         completion: @escaping () -> Void
+    )
+
+    func transitionToIndividualScreen(
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        sheetController: VerificationSheetControllerProtocol
+    )
+
+    func transitionToCountryNotListedScreen(
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        sheetController: VerificationSheetControllerProtocol,
+        missingType: IndividualFormElement.MissingType
     )
 
     func replaceCurrentScreen(
         with viewController: UIViewController
     )
 
-    var uncollectedFields: Set<VerificationPageFieldType> { get }
+    func canPopToScreen(withField field: StripeAPI.VerificationPageFieldType) -> Bool
+
+    func popToScreen(
+        withField field: StripeAPI.VerificationPageFieldType,
+        shouldResetViewController: Bool
+    )
+
+    var analyticsLastScreen: IdentityFlowViewController? { get }
 }
 
-enum VerificationSheetFlowControllerError: Error, Equatable {
-    case missingRequiredInput([VerificationPageFieldType])
+@available(iOSApplicationExtension, unavailable)
+@available(macCatalystApplicationExtension, unavailable)
+@objc(STP_Internal_VerificationSheetFlowController)
+final class VerificationSheetFlowController: NSObject {
 
-    var localizedDescription: String {
-        // TODO(mludowise|IDPROD-2816): Display a different error message since this is an unrecoverable state
-        return NSError.stp_unexpectedErrorMessage()
-    }
-}
+    let brandLogo: UIImage
 
-final class VerificationSheetFlowController {
+    weak var delegate: VerificationSheetFlowControllerDelegate?
 
-    let merchantLogo: UIImage
+    private(set) var isUsingWebView = false
 
-    var delegate: VerificationSheetFlowControllerDelegate?
-
-    init(merchantLogo: UIImage) {
-        self.merchantLogo = merchantLogo
+    init(
+        brandLogo: UIImage
+    ) {
+        self.brandLogo = brandLogo
     }
 
     private(set) lazy var navigationController: UINavigationController = {
-        let navigationController = IdentityFlowNavigationController(rootViewController: LoadingViewController())
+        let navigationController = IdentityFlowNavigationController(
+            rootViewController: LoadingViewController()
+        )
         navigationController.identityDelegate = self
         return navigationController
     }()
@@ -64,30 +91,79 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
     /// - Note: This may replace the navigation stack or push an additional view
     ///   controller onto the stack, depending on whether on where the user is in the flow.
     func transitionToNextScreen(
-        apiContent: VerificationSheetAPIContent,
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        updateDataResult: Result<StripeAPI.VerificationPageData, Error>?,
         sheetController: VerificationSheetControllerProtocol,
         completion: @escaping () -> Void
     ) {
-        // Check if the user is done entering all the missing fields and we tell
-        // the server they're done entering data.
-        if VerificationSheetFlowController.shouldSubmit(apiContent: apiContent) {
-            // Wait until we're done submitting to see if there's an error response
-            sheetController.submit { [weak self, weak sheetController] updatedAPIContent in
-                guard let self = self,
-                      let sheetController = sheetController else {
-                    return
-                }
-                self.transitionToNextScreenWithoutCheckingSubmit(
-                    apiContent: updatedAPIContent,
-                    sheetController: sheetController,
-                    completion: completion
-                )
-            }
-        } else {
-            transitionToNextScreenWithoutCheckingSubmit(
-                apiContent: apiContent,
-                sheetController: sheetController,
+        nextViewController(
+            staticContentResult: staticContentResult,
+            updateDataResult: updateDataResult,
+            sheetController: sheetController
+        ) { [weak self] viewController in
+            self?.transition(
+                to: viewController,
+                shouldAnimate: true,
                 completion: completion
+            )
+        }
+    }
+
+    /// Transitions to the IndividualViewController in the flow with a 'push' animation.
+    func transitionToIndividualScreen(
+        staticContentResult: Result<StripeCore.StripeAPI.VerificationPage, Error>,
+        sheetController: VerificationSheetControllerProtocol
+    ) {
+        let staticContent: StripeAPI.VerificationPage
+        do {
+            staticContent = try staticContentResult.get()
+            self.transition(
+                to: makeIndividualViewController(
+                    staticContent: staticContent,
+                    sheetController: sheetController
+                ),
+                shouldAnimate: true,
+                completion: {}
+            )
+        } catch {
+            self.transition(
+                to: ErrorViewController(
+                    sheetController: sheetController,
+                    error: .error(error)
+                ),
+                shouldAnimate: true,
+                completion: {}
+            )
+        }
+    }
+
+    /// Transitions to the CountryNotListedViewController in the flow with a 'push' animation.
+    func transitionToCountryNotListedScreen(
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        sheetController: VerificationSheetControllerProtocol,
+        missingType: IndividualFormElement.MissingType
+    ) {
+        let staticContent: StripeAPI.VerificationPage
+        do {
+            staticContent = try staticContentResult.get()
+            self.transition(
+                to: CountryNotListedViewController(
+                    missingType: missingType,
+                    countryNotListedContent:
+                        staticContent.countryNotListed,
+                    sheetController: sheetController
+                ),
+                shouldAnimate: true,
+                completion: {}
+            )
+        } catch {
+            self.transition(
+                to: ErrorViewController(
+                    sheetController: sheetController,
+                    error: .error(error)
+                ),
+                shouldAnimate: true,
+                completion: {}
             )
         }
     }
@@ -102,33 +178,62 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
         navigationController.setViewControllers(viewControllers, animated: true)
     }
 
-    /// - Note: This method should not be called directly from outside of this class except for tests
-    func transitionToNextScreenWithoutCheckingSubmit(
-        apiContent: VerificationSheetAPIContent,
-        sheetController: VerificationSheetControllerProtocol,
-        completion: @escaping () -> Void
-    ) {
-        nextViewController(
-            apiContent: apiContent,
-            sheetController: sheetController
-        ) { [weak self] nextViewController in
-            self?.transitionToNextScreen(
-                withViewController: nextViewController,
-                shouldAnimate: true,
-                completion: completion
-            )
-        }
+    func canPopToScreen(withField field: StripeAPI.VerificationPageFieldType) -> Bool {
+        return collectedFields.contains(field)
     }
 
+    func popToScreen(
+        withField field: StripeAPI.VerificationPageFieldType,
+        shouldResetViewController: Bool
+    ) {
+        popToScreen(
+            withField: field,
+            shouldResetViewController: shouldResetViewController,
+            animated: true
+        )
+    }
+
+    func popToScreen(
+        withField field: StripeAPI.VerificationPageFieldType,
+        shouldResetViewController: Bool,
+        animated: Bool
+    ) {
+        guard
+            let index = navigationController.viewControllers.lastIndex(where: {
+                ($0 as? IdentityDataCollecting)?.collectedFields.contains(field) == true
+            })
+        else {
+            return
+        }
+
+        let viewControllers = Array(
+            navigationController.viewControllers.dropLast(
+                navigationController.viewControllers.count - index - 1
+            )
+        )
+
+        // Reset all ViewControllers to be popped
+        if shouldResetViewController {
+            for i in index..<navigationController.viewControllers.count {
+                (navigationController.viewControllers[i] as? IdentityDataCollecting)?.reset()
+            }
+        }
+
+        navigationController.setViewControllers(viewControllers, animated: animated)
+    }
+
+    // MARK: - Helpers
+
     /// - Note: This method should not be called directly from outside of this class except for tests
-    func transitionToNextScreen(
-        withViewController nextViewController: UIViewController,
+    func transition(
+        to nextViewController: UIViewController,
         shouldAnimate: Bool,
         completion: @escaping () -> Void
     ) {
         // If the only view in the stack is a loading screen, they should not be
         // able to hit the back button to get back into a loading state.
-        let isInitialLoadingState = navigationController.viewControllers.count == 1
+        let isInitialLoadingState =
+            navigationController.viewControllers.count == 1
             && navigationController.viewControllers.first is LoadingViewController
 
         // If the user is seeing the success screen, it means their session has
@@ -144,7 +249,7 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
 
         // Call completion block after navigation controller animation, if possible
         guard shouldAnimate,
-              let coordinator = navigationController.transitionCoordinator
+            let coordinator = navigationController.transitionCoordinator
         else {
             DispatchQueue.main.async {
                 completion()
@@ -158,133 +263,230 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
     /// Instantiates and returns the next view controller to display in the flow.
     /// - Note: This method should not be called directly from outside of this class except for tests
     func nextViewController(
-        apiContent: VerificationSheetAPIContent,
+        staticContentResult: Result<StripeAPI.VerificationPage, Error>,
+        updateDataResult: Result<StripeAPI.VerificationPageData, Error>?,
         sheetController: VerificationSheetControllerProtocol,
         completion: @escaping (UIViewController) -> Void
     ) {
-        nextViewController(
-            missingRequirements: apiContent.missingRequirements ?? [],
-            staticContent: apiContent.staticContent,
-            requiredDataErrors: apiContent.requiredDataErrors,
-            isSubmitted: apiContent.submitted ?? false,
-            lastError: apiContent.lastError,
-            sheetController: sheetController,
-            completion: completion
+        // Check for API Errors
+        let staticContent: StripeAPI.VerificationPage
+        let updateDataResponse: StripeAPI.VerificationPageData?
+        do {
+            staticContent = try staticContentResult.get()
+            updateDataResponse = try updateDataResult?.get()
+        } catch {
+            return completion(
+                ErrorViewController(
+                    sheetController: sheetController,
+                    error: .error(error)
+                )
+            )
+        }
+
+        // Check for validation errors
+        if let inputError = updateDataResponse?.requirements.errors.first {
+            return completion(
+                ErrorViewController(
+                    sheetController: sheetController,
+                    error: .inputError(inputError)
+                )
+            )
+        }
+
+        // If client is unsupported, fallback to web
+        if staticContent.unsupportedClient {
+            isUsingWebView = true
+            return completion(
+                makeWebViewController(
+                    staticContent: staticContent,
+                    sheetController: sheetController
+                )
+            )
+        }
+
+        // If updateDataResponse is not nil, then this transition is triggered by a
+        // VerificationPageDataUpdate request, get missing requirements from the response.
+        // Otherwise, this is the transition to initial page, nothing is collected yet,
+        // return missing requirement from staticContent.
+        let missingRequirements =
+            updateDataResponse?.requirements.missing ?? staticContent.requirements.missing
+
+        // Show success screen if submitted
+        if updateDataResponse?.submitted == true {
+            return completion(
+                SuccessViewController(
+                    successContent: staticContent.success,
+                    sheetController: sheetController
+                )
+            )
+        } else if !missingRequirements.isDisjoint(with: [.name, .dob]) {
+            // if missing .name or .dob, then verification type is not document.
+            // Transition to IndividualWelcomeViewController.
+            return completion(
+                makeIndividualWelcomeViewController(
+                    staticContent: staticContent,
+                    sheetController: sheetController
+                )
+            )
+        } else if missingRequirements.contains(.biometricConsent) {
+            return completion(
+                makeBiometricConsentViewController(
+                    staticContent: staticContent,
+                    sheetController: sheetController
+                )
+            )
+        } else if missingRequirements.contains(.idDocumentType) {
+            return completion(
+                makeDocumentTypeSelectViewController(
+                    sheetController: sheetController,
+                    staticContent: staticContent
+                )
+            )
+        } else if !missingRequirements.isDisjoint(with: [.idDocumentFront, .idDocumentBack]) {
+            return sheetController.mlModelLoader.documentModelsFuture.observe(on: .main) {
+                [weak self] result in
+                guard let self = self else { return }
+                completion(
+                    self.makeDocumentCaptureViewController(
+                        documentScannerResult: result,
+                        staticContent: staticContent,
+                        sheetController: sheetController
+                    )
+                )
+            }
+        } else if missingRequirements.contains(.face) {
+            return sheetController.mlModelLoader.faceModelsFuture.observe(on: .main) {
+                [weak self] result in
+                guard let self = self else { return }
+                completion(
+                    self.makeSelfieCaptureViewController(
+                        faceScannerResult: result,
+                        staticContent: staticContent,
+                        sheetController: sheetController
+                    )
+                )
+            }
+        } else if !missingRequirements.isDisjoint(with: [.address, .idNumber]) {
+            // if missing .address or .idNumber but not missing .name or .dob, then verification type is document.
+            // IndividualViewController is the screen after document collection.
+            return completion(
+                makeIndividualViewController(
+                    staticContent: staticContent,
+                    sheetController: sheetController
+                )
+            )
+        }
+
+        // The client cannot create a screen for the missing requirement
+        return completion(
+            ErrorViewController(
+                sheetController: sheetController,
+                error: .error(
+                    VerificationSheetFlowControllerError.noScreenForRequirements(
+                        missingRequirements
+                    )
+                )
+            )
         )
     }
 
-    /// - Note: This method should not be called directly from outside of this class except for tests
-    func nextViewController(
-        missingRequirements: Set<VerificationPageFieldType>,
-        staticContent: VerificationPage?,
-        requiredDataErrors: [VerificationPageDataRequirementError],
-        isSubmitted: Bool,
-        lastError: Error?,
-        sheetController: VerificationSheetControllerProtocol,
-        completion: @escaping (UIViewController) -> Void
-    ) {
-        if let lastError = lastError {
-            return completion(ErrorViewController(
-                sheetController: sheetController,
-                error: .error(lastError)
-            ))
-        }
-
-        if let inputError = requiredDataErrors.first {
-            return completion(ErrorViewController(
-                sheetController: sheetController,
-                error: .inputError(inputError)
-            ))
-        }
-
-        guard let staticContent = staticContent else {
-            return completion(ErrorViewController(
-                sheetController: sheetController,
-                error: .error(NSError.stp_genericConnectionError())
-            ))
-        }
-
-        if isSubmitted {
-            return completion(SuccessViewController(
-                successContent: staticContent.success,
+    func makeIndividualWelcomeViewController(
+        staticContent: StripeAPI.VerificationPage,
+        sheetController: VerificationSheetControllerProtocol
+    ) -> UIViewController {
+        do {
+            return try IndividualWelcomeViewController(
+                brandLogo: brandLogo,
+                welcomeContent: staticContent.individualWelcome,
                 sheetController: sheetController
-            ))
-        } else if missingRequirements.contains(.biometricConsent) {
-            return completion(makeBiometricConsentViewController(
-                staticContent: staticContent,
-                sheetController: sheetController
-            ))
-        } else if missingRequirements.contains(.idDocumentType) {
-            return completion(DocumentTypeSelectViewController(
+            )
+        } catch {
+            return ErrorViewController(
                 sheetController: sheetController,
-                staticContent: staticContent.documentSelect
-            ))
-        } else if !missingRequirements.intersection([.idDocumentFront, .idDocumentBack]).isEmpty {
-            return sheetController.mlModelLoader.documentModelsFuture.observe(on: .main) { [weak self] result in
-                guard let self = self else { return }
-                completion(self.makeDocumentCaptureViewController(
-                    documentScannerResult: result,
-                    staticContent: staticContent,
-                    sheetController: sheetController
-                ))
-            }
+                error: .error(
+                    VerificationSheetFlowControllerError.unknown(error)
+                )
+            )
         }
+    }
 
-        // TODO(mludowise|IDPROD-2816): Display a different error message and
-        // log an analytic since this is an unrecoverable state that means we've
-        // sent a configuration from the server that the client can't handle.
-        return completion(ErrorViewController(
-            sheetController: sheetController,
-            error: .error(NSError.stp_genericConnectionError())
-        ))
+    func makeIndividualViewController(
+        staticContent: StripeAPI.VerificationPage,
+        sheetController: VerificationSheetControllerProtocol
+    ) -> UIViewController {
+        return IndividualViewController(
+            individualContent: staticContent.individual,
+            missing: staticContent.requirements.missing,
+            sheetController: sheetController
+        )
     }
 
     func makeBiometricConsentViewController(
-        staticContent: VerificationPage,
+        staticContent: StripeAPI.VerificationPage,
         sheetController: VerificationSheetControllerProtocol
     ) -> UIViewController {
         do {
             return try BiometricConsentViewController(
-                merchantLogo: merchantLogo,
+                brandLogo: brandLogo,
                 consentContent: staticContent.biometricConsent,
                 sheetController: sheetController
             )
         } catch {
-            // TODO(mludowise|IDPROD-2816): Display a different error message and
-            // log an analytic since this is an unrecoverable state that means we've
-            // sent a configuration from the server that the client can't handle.
             return ErrorViewController(
                 sheetController: sheetController,
-                error: .error(NSError.stp_genericConnectionError())
+                error: .error(
+                    VerificationSheetFlowControllerError.unknown(error)
+                )
+            )
+        }
+    }
+
+    func makeDocumentTypeSelectViewController(
+        sheetController: VerificationSheetControllerProtocol,
+        staticContent: StripeAPI.VerificationPage
+    ) -> UIViewController {
+        do {
+            return try DocumentTypeSelectViewController(
+                sheetController: sheetController,
+                staticContent: staticContent.documentSelect
+            )
+        } catch let error {
+            return ErrorViewController(
+                sheetController: sheetController,
+                error: .error(
+                    VerificationSheetFlowControllerError.unknown(error)
+                )
             )
         }
     }
 
     func makeDocumentCaptureViewController(
-        documentScannerResult: Result<DocumentScannerProtocol, Error>,
-        staticContent: VerificationPage,
+        documentScannerResult: Result<AnyDocumentScanner, Error>,
+        staticContent: StripeAPI.VerificationPage,
         sheetController: VerificationSheetControllerProtocol
     ) -> UIViewController {
         // Show error if we haven't collected document type
-        guard let documentType = sheetController.collectedData.idDocument?.type else {
-            // TODO(mludowise|IDPROD-2816): Log an analytic since this is an
-            // unrecoverable state that means we've sent a configuration
-            // from the server that the client can't handle.
+        guard let documentType = sheetController.collectedData.idDocumentType else {
             return ErrorViewController(
                 sheetController: sheetController,
-                error: .error(VerificationSheetFlowControllerError.missingRequiredInput([.idDocumentType]))
+                error: .error(
+                    VerificationSheetFlowControllerError.missingRequiredInput([.idDocumentType])
+                )
             )
         }
 
         let documentUploader = DocumentUploader(
-            configuration: .init(from: staticContent.documentCapture),
-            apiClient: sheetController.apiClient
+            imageUploader: IdentityImageUploader(
+                configuration: .init(from: staticContent.documentCapture),
+                apiClient: sheetController.apiClient,
+                analyticsClient: sheetController.analyticsClient,
+                idDocumentType: documentType
+            )
         )
 
         switch documentScannerResult {
-        case .failure:
-            // TODO(mludowise|IDPROD-2816): Log an analytic since this means the
-            // ML models cannot be loaded.
+        case .failure(let error):
+            sheetController.analyticsClient.logGenericError(error: error)
 
             // Return document upload screen if we can't load models for auto-capture
             return DocumentFileUploadViewController(
@@ -294,41 +496,111 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
                 documentUploader: documentUploader
             )
 
-        case .success(let documentScanner):
+        case .success(let anyDocumentScanner):
             return DocumentCaptureViewController(
                 apiConfig: staticContent.documentCapture,
                 documentType: documentType,
                 sheetController: sheetController,
                 cameraSession: makeDocumentCaptureCameraSession(),
                 documentUploader: documentUploader,
-                documentScanner: documentScanner
+                anyDocumentScanner: anyDocumentScanner
             )
         }
     }
 
+    func makeSelfieCaptureViewController(
+        faceScannerResult: Result<AnyFaceScanner, Error>,
+        staticContent: StripeAPI.VerificationPage,
+        sheetController: VerificationSheetControllerProtocol
+    ) -> UIViewController {
+        guard let selfiePageConfig = staticContent.selfie else {
+            return ErrorViewController(
+                sheetController: sheetController,
+                error: .error(
+                    VerificationSheetFlowControllerError.missingSelfieConfig
+                )
+            )
+        }
+
+        switch faceScannerResult {
+
+        case .success(let anyFaceScanner):
+            return SelfieCaptureViewController(
+                apiConfig: selfiePageConfig,
+                sheetController: sheetController,
+                cameraSession: makeSelfieCaptureCameraSession(),
+                selfieUploader: SelfieUploader(
+                    imageUploader: IdentityImageUploader(
+                        configuration: .init(from: selfiePageConfig),
+                        apiClient: sheetController.apiClient,
+                        analyticsClient: sheetController.analyticsClient,
+                        idDocumentType: nil
+                    )
+                ),
+                anyFaceScanner: anyFaceScanner
+            )
+
+        case .failure(let error):
+            return ErrorViewController(
+                sheetController: sheetController,
+                error: .error(
+                    VerificationSheetFlowControllerError.unknown(error)
+                )
+            )
+        }
+    }
+
+    func makeWebViewController(
+        staticContent: StripeAPI.VerificationPage,
+        sheetController: VerificationSheetControllerProtocol
+    ) -> UIViewController {
+        guard let url = URL(string: staticContent.fallbackUrl) else {
+            return ErrorViewController(
+                sheetController: sheetController,
+                error: .error(
+                    VerificationSheetFlowControllerError.malformedURL(staticContent.fallbackUrl)
+                )
+            )
+        }
+        if #available(iOS 14.3, *) {
+            return VerificationFlowWebViewController(
+                startUrl: url,
+                delegate: self
+            )
+        }
+
+        let safariVC = SFSafariViewController(url: url)
+        safariVC.delegate = self
+        return safariVC
+    }
+
     private func makeDocumentCaptureCameraSession() -> CameraSessionProtocol {
         #if targetEnvironment(simulator)
-            return MockSimulatorCameraSession(images: IdentityVerificationSheet.simulatorDocumentCameraImages)
+        return MockSimulatorCameraSession(
+            images: IdentityVerificationSheet.simulatorDocumentCameraImages
+        )
         #else
-            return CameraSession()
+        return CameraSession()
         #endif
     }
 
-    /// Returns true if the user has finished filling out the required fields and the VerificationSession is ready to be submitted
-    static func shouldSubmit(apiContent: VerificationSheetAPIContent) -> Bool {
-        guard let missingRequirements = apiContent.missingRequirements,
-              let isSubmitted = apiContent.submitted,
-              apiContent.lastError == nil && apiContent.requiredDataErrors.isEmpty else {
-            return false
-        }
-        return missingRequirements.isEmpty && !isSubmitted
+    private func makeSelfieCaptureCameraSession() -> CameraSessionProtocol {
+        #if targetEnvironment(simulator)
+        return MockSimulatorCameraSession(
+            images: IdentityVerificationSheet.simulatorSelfieCameraImages
+        )
+        #else
+        return CameraSession()
+        #endif
     }
 
     // MARK: - Collected Fields
 
     /// Set of fields the view controllers in the navigation stack are collecting from the user
-    var collectedFields: Set<VerificationPageFieldType> {
-        return navigationController.viewControllers.reduce(Set<VerificationPageFieldType>()) { partialResult, vc in
+    var collectedFields: Set<StripeAPI.VerificationPageFieldType> {
+        return navigationController.viewControllers.reduce(
+            Set<StripeAPI.VerificationPageFieldType>()
+        ) { partialResult, vc in
             guard let dataCollectingVC = vc as? IdentityDataCollecting else {
                 return partialResult
             }
@@ -336,16 +608,50 @@ extension VerificationSheetFlowController: VerificationSheetFlowControllerProtoc
         }
     }
 
-    /// Set of fields not collected by any of the view controllers in the navigation stack
-    var uncollectedFields: Set<VerificationPageFieldType> {
-        return Set(VerificationPageFieldType.allCases).subtracting(collectedFields)
+    var analyticsLastScreen: IdentityFlowViewController? {
+        return navigationController.viewControllers.compactMap {
+            $0 as? IdentityFlowViewController
+        }.last
     }
 }
 
 // MARK: - IdentityFlowNavigationControllerDelegate
 
+@available(iOSApplicationExtension, unavailable)
 extension VerificationSheetFlowController: IdentityFlowNavigationControllerDelegate {
-    func identityFlowNavigationControllerDidDismiss(_ navigationController: IdentityFlowNavigationController) {
-        delegate?.verificationSheetFlowControllerDidDismiss(self)
+    func identityFlowNavigationControllerDidDismiss(
+        _ navigationController: IdentityFlowNavigationController
+    ) {
+        // Only call DidDismissNativeView if the user did not dismiss a web view
+        guard !isUsingWebView else {
+            return
+        }
+
+        delegate?.verificationSheetFlowControllerDidDismissNativeView(self)
+    }
+}
+
+// MARK: - VerificationFlowWebViewControllerDelegate
+
+@available(iOS 14.3, *)
+@available(iOSApplicationExtension, unavailable)
+extension VerificationSheetFlowController: VerificationFlowWebViewControllerDelegate {
+    func verificationFlowWebViewController(
+        _ viewController: VerificationFlowWebViewController,
+        didFinish result: IdentityVerificationSheet.VerificationFlowResult
+    ) {
+        // NOTE: We're intentionally ignoring the result value since it will no
+        // longer be returned when native component experience is ready for release.
+        delegate?.verificationSheetFlowControllerDidDismissWebView(self)
+    }
+}
+
+// MARK: - SFSafariViewControllerDelegate
+
+@available(iOSApplicationExtension, unavailable)
+@available(macCatalystApplicationExtension, unavailable)
+extension VerificationSheetFlowController: SFSafariViewControllerDelegate {
+    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        delegate?.verificationSheetFlowControllerDidDismissWebView(self)
     }
 }

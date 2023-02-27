@@ -8,20 +8,22 @@
 
 import Foundation
 
-/// Enumeration of all the analytic events logged by our SDK
+/// Enumeration of all the analytic events logged by our SDK.
 @_spi(STP) public enum STPAnalyticEvent: String {
     // MARK: - Payment Creation
     case tokenCreation = "stripeios.token_creation"
-    
-    // This was "stripeios.source_creation" in earlier SDKs, but we need to support both the old and new values forever.
+
+    // This was "stripeios.source_creation" in earlier SDKs,
+    // but we need to support both the old and new values forever.
     case sourceCreation = "stripeios.source_creationn"
-    
+
     case paymentMethodCreation = "stripeios.payment_method_creation"
     case paymentMethodIntentCreation = "stripeios.payment_intent_confirmation"
     case setupIntentConfirmationAttempt = "stripeios.setup_intent_confirmation"
 
     // MARK: - Payment Confirmation
-    case _3DS2AuthenticationRequestParamsFailed = "stripeios.3ds2_authentication_request_params_failed"
+    case _3DS2AuthenticationRequestParamsFailed =
+        "stripeios.3ds2_authentication_request_params_failed"
     case _3DS2AuthenticationAttempt = "stripeios.3ds2_authenticate"
     case _3DS2FrictionlessFlow = "stripeios.3ds2_frictionless_flow"
     case urlRedirectNextAction = "stripeios.url_redirect_next_action"
@@ -30,6 +32,7 @@ import Foundation
     case _3DS2ChallengeFlowUserCanceled = "stripeios.3ds2_challenge_flow_canceled"
     case _3DS2ChallengeFlowCompleted = "stripeios.3ds2_challenge_flow_completed"
     case _3DS2ChallengeFlowErrored = "stripeios.3ds2_challenge_flow_errored"
+    case _3DS2RedirectUserCanceled = "stripeios.3ds2_redirect_canceled"
 
     // MARK: - Card Metadata
     case cardMetadataLoadedTooSlow = "stripeios.card_metadata_loaded_too_slow"
@@ -44,7 +47,12 @@ import Foundation
     case verificationSheetPresented = "stripeios.idprod.verification_sheet.presented"
     case verificationSheetClosed = "stripeios.idprod.verification_sheet.closed"
     case verificationSheetFailed = "stripeios.idprod.verification_sheet.failed"
-    
+
+    // MARK: - FinancialConnections
+    case financialConnectionsSheetPresented = "stripeios.financialconnections.sheet.presented"
+    case financialConnectionsSheetClosed = "stripeios.financialconnections.sheet.closed"
+    case financialConnectionsSheetFailed = "stripeios.financialconnections.sheet.failed"
+
     // MARK: - PaymentSheet Init
     case mcInitCustomCustomer = "mc_custom_init_customer"
     case mcInitCompleteCustomer = "mc_complete_init_customer"
@@ -54,7 +62,7 @@ import Foundation
     case mcInitCompleteCustomerApplePay = "mc_complete_init_customer_applepay"
     case mcInitCustomDefault = "mc_custom_init_default"
     case mcInitCompleteDefault = "mc_complete_init_default"
-    
+
     // MARK: - PaymentSheet Show
     case mcShowCustomNewPM = "mc_custom_sheet_newpm_show"
     case mcShowCustomSavedPM = "mc_custom_sheet_savedpm_show"
@@ -64,28 +72,28 @@ import Foundation
     case mcShowCompleteSavedPM = "mc_complete_sheet_savedpm_show"
     case mcShowCompleteApplePay = "mc_complete_sheet_applepay_show"
     case mcShowCompleteLink = "mc_complete_sheet_link_show"
-    
+
     // MARK: - PaymentSheet Payment
     case mcPaymentCustomNewPMSuccess = "mc_custom_payment_newpm_success"
     case mcPaymentCustomSavedPMSuccess = "mc_custom_payment_savedpm_success"
     case mcPaymentCustomApplePaySuccess = "mc_custom_payment_applepay_success"
     case mcPaymentCustomLinkSuccess = "mc_custom_payment_link_success"
-    
+
     case mcPaymentCompleteNewPMSuccess = "mc_complete_payment_newpm_success"
     case mcPaymentCompleteSavedPMSuccess = "mc_complete_payment_savedpm_success"
     case mcPaymentCompleteApplePaySuccess = "mc_complete_payment_applepay_success"
     case mcPaymentCompleteLinkSuccess = "mc_complete_payment_link_success"
-    
+
     case mcPaymentCustomNewPMFailure = "mc_custom_payment_newpm_failure"
     case mcPaymentCustomSavedPMFailure = "mc_custom_payment_savedpm_failure"
     case mcPaymentCustomApplePayFailure = "mc_custom_payment_applepay_failure"
     case mcPaymentCustomLinkFailure = "mc_custom_payment_link_failure"
-    
+
     case mcPaymentCompleteNewPMFailure = "mc_complete_payment_newpm_failure"
     case mcPaymentCompleteSavedPMFailure = "mc_complete_payment_savedpm_failure"
     case mcPaymentCompleteApplePayFailure = "mc_complete_payment_applepay_failure"
     case mcPaymentCompleteLinkFailure = "mc_complete_payment_link_failure"
-    
+
     // MARK: - PaymentSheet Option Selected
     case mcOptionSelectCustomNewPM = "mc_custom_paymentoption_newpm_select"
     case mcOptionSelectCustomSavedPM = "mc_custom_paymentoption_savedpm_select"
@@ -105,8 +113,27 @@ import Foundation
 
     // MARK: - Link 2FA
     case link2FAStart = "link.2fa.start"
+    case link2FAStartFailure = "link.2fa.start_failure"
     case link2FAComplete = "link.2fa.complete"
     case link2FACancel = "link.2fa.cancel"
     case link2FAFailure = "link.2fa.failure"
 
+    // MARK: - Link Misc
+    case linkAccountLookupFailure = "link.account_lookup.failure"
+
+    // MARK: - LUXE
+    case luxeSerializeFailure = "luxe_serialize_failure"
+
+    case luxeImageSelectorIconDownloaded = "luxe_image_selector_icon_downloaded"
+    case luxeImageSelectorIconFromBundle = "luxe_image_selector_icon_from_bundle"
+    case luxeImageSelectorIconNotFound = "luxe_image_selector_icon_not_found"
+
+    // MARK: - Address Element
+    case addressShow = "mc_address_show"
+    case addressCompleted = "mc_address_completed"
+
+    // MARK: - PaymentMethodMessagingView
+    case paymentMethodMessagingViewLoadSucceeded = "pmmv_load_succeeded"
+    case paymentMethodMessagingViewLoadFailed = "pmmv_load_failed"
+    case paymentMethodMessagingViewTapped = "pmmv_tapped"
 }

@@ -3,12 +3,28 @@
 //  StripeUICore
 //
 //  Created by Mel Ludowise on 9/16/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
 @_spi(STP) public extension UIView {
+    /// - Note: This variant of `addAndPinSubview` respects the view's `directionalLayoutMargins` property.
+    /// This is useful if your margins can change dynamically.
+    func addAndPinSubview(_ view: UIView, directionalLayoutMargins: NSDirectionalEdgeInsets) {
+        self.directionalLayoutMargins = directionalLayoutMargins
+        view.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(view)
+
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            view.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+            view.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+        ])
+    }
+
     func addAndPinSubview(_ view: UIView, insets: NSDirectionalEdgeInsets = .zero) {
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
@@ -42,19 +58,37 @@ import UIKit
     ) {
         let userInfo = notification.userInfo
 
-        guard let duration = userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else {
+        guard let duration = userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double else {
             animations()
             return
         }
 
+        // Get keyboard animation info
         // TODO(ramont): extract animation curve from `keyboardAnimationCurveUserInfoKey`
         // (see: http://www.openradar.me/42609976)
+        let curve = UIView.AnimationCurve.easeOut
 
-        UIView.animate(
-            withDuration: duration.doubleValue,
-            delay: 0,
-            options: [.curveEaseOut],
-            animations: animations
-        )
+        // Animate the container above the keyboard
+        // Note: We prefer UIViewPropertyAnimator over UIView.animate because it handles consecutive animation calls better. Sometimes this happens when one text field resigns and another immediately becomes first responder.
+        let animator = UIViewPropertyAnimator(duration: duration, curve: curve) {
+            animations()
+        }
+        animator.startAnimation()
+    }
+
+    // Don't set isHidden redundantly or you might hit a bug: http://www.openradar.me/25087688
+    func setHiddenIfNecessary(_ shouldHide: Bool) {
+        if isHidden != shouldHide {
+            isHidden = shouldHide
+        }
+    }
+
+    func firstResponder() -> UIView? {
+        for subview in subviews {
+            if let firstResponder = subview.firstResponder() {
+                return firstResponder
+            }
+        }
+        return isFirstResponder ? self : nil
     }
 }

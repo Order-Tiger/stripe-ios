@@ -2,6 +2,7 @@
 
 # This is a support file for the other release scripts.
 
+require_relative 'common'
 require 'fileutils'
 require 'optparse'
 require 'colorize'
@@ -17,47 +18,56 @@ ROOT_DIR_PATHNAME = Pathname(ROOT_DIR)
 
 Dir.chdir(ROOT_DIR)
 
-@step_index = 0
+@step_index = 1
 
 OptionParser.new do |opts|
   opts.banner = "Release scripts\n Usage: script.rb [options]"
 
-  opts.on("--version VERSION",
-    "Version to release (e.g. 21.2.0)") do |t|
+  opts.on('--version VERSION',
+          'Version to release (e.g. 21.2.0)') do |t|
     @specified_version = t
   end
 
-  opts.on("--dry-run", "Don't do any real deployment, just build") do |s|
+  opts.on('--dry-run', "Don't do any real deployment, just build") do |s|
     @is_dry_run = s
   end
 
-  opts.on("--continue-from NUMBER",
-    "Continue from a specified step") do |t|
+  opts.on('--continue-from NUMBER',
+          'Continue from a specified step') do |t|
     @step_index = t.to_i
   end
 end.parse!
 
-def notify_user
-  puts "Press enter to continue... \a".red
+# Joins the given strings. If one or more arguments is nil or empty, an exception is raised.
+def File.join_if_safe(arg1, *otherArgs)
+  args = [arg1] + otherArgs
+
+  # Check for empty or nil strings
+  args.each do |arg|
+    raise 'Cannot join nil or empty string.' if arg.nil? || arg.empty?
+  end
+
+  File.join(args)
+end
+
+def prompt_user(prompt)
+  puts "#{prompt} \a".red
   STDIN.gets unless @is_dry_run
 end
 
-def get_current_release_version_of_repo(repo)
-  begin
-    latest_version = Octokit.latest_release(repo)
-    latest_version.tag_name
-  rescue
-    raise "No releases found."
-  end
+def notify_user
+  prompt_user 'Press enter to continue...'
 end
 
-def run_command(command)
-  puts "> #{command}".blue
-  system("#{command}")
-  if $?.exitstatus != 0
-    rputs "Command failed: #{command} \a"
-    raise
-  end
+def open_url(url)
+  `open '#{url}'` unless @is_dry_run
+end
+
+def get_current_release_version_of_repo(repo)
+  latest_version = Octokit.latest_release(repo)
+  latest_version.tag_name
+rescue StandardError
+  raise 'No releases found.'
 end
 
 def changelog(version)
@@ -78,10 +88,10 @@ end
 
 def update_placeholder(version, filename)
   changelog = IO.readlines(filename).map do |line|
-    if line.start_with?('## X')
+    if line.upcase.start_with?('## X')
       "## #{version} #{Time.now.strftime('%Y-%m-%d')}\n"
-    elsif line.start_with?('## Migrating from versions < X')
-      "## Migrating from versions < #{version}\n"
+    elsif line.start_with?('### Migrating from versions < X')
+      "### Migrating from versions < #{version}\n"
     else
       line
     end
@@ -101,10 +111,6 @@ def version_from_file
   version
 end
 
-def rputs(string)
-  puts string.red
-end
-
 def github_login
   token = `fetch-password -q bindings/gh-tokens/$USER`
   if $?.exitstatus != 0
@@ -112,13 +118,28 @@ def github_login
     exit(1)
   end
   client = Octokit::Client.new(access_token: token)
-  abort('Invalid GitHub token. Follow the wiki instructions for setting up a GitHub token.') unless client.login 
+  abort('Invalid GitHub token. Follow the wiki instructions for setting up a GitHub token.') unless client.login
   client
 end
 
-def pod_lint_common
-  # Validate the Stripe pods
-  run_command('pod lib lint --include-podspecs=\'*.podspec\'')
+def execute_steps(steps, step_index)
+  step_count = steps.length
+
+  if step_index > 1
+    steps = steps.drop(step_index - 1)
+    rputs "Continuing from step #{step_index}: #{steps.first.name}"
+  end
+
+  begin
+    steps.each do |step|
+      rputs "# #{step.name} (step #{step_index}/#{step_count})"
+      step.call
+      step_index += 1
+    end
+  rescue Exception => e
+    rputs "Restart with --continue-from #{step_index} to re-run from this step."
+    raise
+  end
 end
 
 @github_client = github_login unless @is_dry_run

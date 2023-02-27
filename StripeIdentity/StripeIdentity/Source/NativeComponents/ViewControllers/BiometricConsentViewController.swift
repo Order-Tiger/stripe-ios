@@ -3,18 +3,20 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 10/29/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
 @_spi(STP) import StripeCore
 @_spi(STP) import StripeUICore
+import UIKit
 
+@available(iOSApplicationExtension, unavailable)
 final class BiometricConsentViewController: IdentityFlowViewController {
 
     private let htmlView = HTMLViewWithIconLabels()
 
-    let merchantLogo: UIImage
-    let consentContent: VerificationPageStaticContentConsentPage
+    let brandLogo: UIImage
+    let consentContent: StripeAPI.VerificationPageStaticContentConsentPage
 
     private var consentSelection: Bool?
 
@@ -23,6 +25,14 @@ final class BiometricConsentViewController: IdentityFlowViewController {
             updateUI()
         }
     }
+
+    var scrolledToBottom = false {
+        didSet {
+            updateUI()
+        }
+    }
+
+    private var scrolledToBottomYOffset: CGFloat?
 
     var flowViewModel: IdentityFlowView.ViewModel {
 
@@ -42,82 +52,107 @@ final class BiometricConsentViewController: IdentityFlowViewController {
             declineButtonState = .enabled
         }
 
-        return .init(
-            headerViewModel: .init(
-                backgroundColor: IdentityUI.containerColor,
-                headerType: .banner(iconViewModel: .init(
-                    iconType: .brand,
-                    iconImage: merchantLogo,
-                    iconImageContentMode: .scaleToFill
-                )),
-                titleText: consentContent.title
-            ),
-            contentViewModel: .init(
-                view: htmlView,
-                inset: .init(top: 32, leading: 16, bottom: 8, trailing: 16)
-            ),
-            buttons: [
+        var buttons: [IdentityFlowView.ViewModel.Button] = []
+        if scrolledToBottom {
+            buttons.append(
                 .init(
                     text: consentContent.acceptButtonText,
                     state: acceptButtonState,
                     didTap: { [weak self] in
                         self?.didTapButton(consentValue: true)
                     }
-                ),
-                .init(
-                    text: consentContent.declineButtonText,
-                    state: declineButtonState,
-                    didTap: { [weak self] in
-                        self?.didTapButton(consentValue: false)
-                    }
                 )
-            ]
+            )
+        } else {
+            buttons.append(
+                .init(
+                    text: consentContent.scrollToContinueButtonText,
+                    state: .disabled,
+                    didTap: {}
+                )
+            )
+        }
+        buttons.append(
+            .init(
+                text: consentContent.declineButtonText,
+                state: declineButtonState,
+                didTap: { [weak self] in
+                    self?.didTapButton(consentValue: false)
+                }
+            )
+        )
+
+        return .init(
+            headerViewModel: .init(
+                backgroundColor: .systemBackground,
+                headerType: .banner(
+                    iconViewModel: .init(
+                        iconType: .brand,
+                        iconImage: brandLogo,
+                        iconImageContentMode: .scaleToFill
+                    )
+                ),
+                titleText: consentContent.title
+            ),
+            contentViewModel: .init(
+                view: htmlView,
+                inset: .init(top: 16, leading: 16, bottom: 8, trailing: 16)
+            ),
+            buttons: buttons,
+            scrollViewDelegate: self,
+            flowViewDelegate: self
         )
     }
 
     init(
-        merchantLogo: UIImage,
-        consentContent: VerificationPageStaticContentConsentPage,
+        brandLogo: UIImage,
+        consentContent: StripeAPI.VerificationPageStaticContentConsentPage,
         sheetController: VerificationSheetControllerProtocol
     ) throws {
-        self.merchantLogo = merchantLogo
+        self.brandLogo = brandLogo
         self.consentContent = consentContent
-        super.init(sheetController: sheetController)
+        super.init(sheetController: sheetController, analyticsScreenName: .biometricConsent)
 
         // If HTML fails to render, throw error since it's unacceptable to not
         // display consent copy
-        try htmlView.configure(with: .init(
-            iconText: [
-                .init(
-                    image: Image.iconClock.makeImage(),
-                    text: consentContent.timeEstimate,
-                    isTextHTML: false
-                ),
-                .init(
-                    image: Image.iconInfo.makeImage(),
-                    text: consentContent.privacyPolicy,
-                    isTextHTML: true
-                ),
-            ],
-            bodyHtmlString: consentContent.body,
-            didOpenURL: { [weak self] url in
-                self?.openInSafariViewController(url: url)
-            }
-        ))
+        try htmlView.configure(
+            with: .init(
+                iconText: [
+                    .init(
+                        image: Image.iconClock.makeImage().withTintColor(IdentityUI.iconColor),
+                        text: consentContent.timeEstimate,
+                        isTextHTML: false
+                    ),
+                ],
+                nonIconText: [
+                    .init(
+                        text: consentContent.privacyPolicy,
+                        isTextHTML: true
+                    ),
+                ],
+                bodyHtmlString: consentContent.body,
+                didOpenURL: { [weak self] url in
+                    self?.openInSafariViewController(url: url)
+                }
+            )
+        )
 
         updateUI()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(
+        coder: NSCoder
+    ) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
 // MARK: - Private Helpers
 
-private extension BiometricConsentViewController {
+@available(iOSApplicationExtension, unavailable)
+extension BiometricConsentViewController {
 
-    func updateUI() {
+    fileprivate func updateUI() {
         configure(
             backButtonTitle: STPLocalizedString(
                 "Consent",
@@ -127,12 +162,15 @@ private extension BiometricConsentViewController {
         )
     }
 
-    func didTapButton(consentValue: Bool) {
+    fileprivate func didTapButton(consentValue: Bool) {
         consentSelection = consentValue
         isSaving = true
-        sheetController?.saveAndTransition(collectedData: .init(
-            biometricConsent: consentValue
-        )) { [weak self] in
+        sheetController?.saveAndTransition(
+            from: analyticsScreenName,
+            collectedData: .init(
+                biometricConsent: consentValue
+            )
+        ) { [weak self] in
             self?.isSaving = false
         }
     }
@@ -140,8 +178,45 @@ private extension BiometricConsentViewController {
 
 // MARK: - IdentityDataCollecting
 
+@available(iOSApplicationExtension, unavailable)
 extension BiometricConsentViewController: IdentityDataCollecting {
-    var collectedFields: Set<VerificationPageFieldType> {
+    var collectedFields: Set<StripeAPI.VerificationPageFieldType> {
         return [.biometricConsent]
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+@available(iOS 13, *)
+@available(iOSApplicationExtension, unavailable)
+extension BiometricConsentViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if let scrolledToBottomYOffset = scrolledToBottomYOffset,
+            scrollView.contentOffset.y > scrolledToBottomYOffset
+        {
+            scrolledToBottom = true
+        }
+    }
+}
+
+// MARK: - IdentityFlowViewDelegate
+@available(iOS 13, *)
+@available(iOSApplicationExtension, unavailable)
+extension BiometricConsentViewController: IdentityFlowViewDelegate {
+    func scrollViewFullyLaiedOut(_ scrollView: UIScrollView) {
+        guard scrolledToBottomYOffset == nil else {
+            return
+        }
+
+        let initialContentYOffset = scrollView.contentOffset.y
+        let contentSizeHeight = scrollView.contentSize.height
+        let visibleContentHeight =
+            scrollView.frame.size.height + initialContentYOffset - scrollView.contentInset.bottom
+        let nonVisibleContentHeight = contentSizeHeight - visibleContentHeight
+        scrolledToBottomYOffset = initialContentYOffset + nonVisibleContentHeight
+
+        // all content is visible, not scrollable
+        if visibleContentHeight > contentSizeHeight {
+            scrolledToBottom = true
+        }
     }
 }

@@ -114,12 +114,21 @@ import Foundation
         super.init()
     }
 
-    public convenience init(value: Value) {
+    public convenience init(
+        value: Value
+    ) {
         self.init()
 
         // If the value was already known at the time the promise
         // was constructed, we can report it directly:
         result = .success(value)
+    }
+
+    public convenience init(
+        error: Error
+    ) {
+        self.init()
+        result = .failure(error)
     }
 
     public func resolve(with value: Value) {

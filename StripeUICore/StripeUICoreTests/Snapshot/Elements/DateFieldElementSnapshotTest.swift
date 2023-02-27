@@ -3,9 +3,10 @@
 //  StripeUICoreTests
 //
 //  Created by Mel Ludowise on 10/1/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
 import StripeCoreTestUtils
 @_spi(STP) @testable import StripeUICore
 
@@ -80,6 +81,6 @@ private extension DateFieldElementSnapshotTest {
                 line: UInt = #line) {
         let view = dateFieldElement.view
         view.autosizeHeight(width: 200)
-        FBSnapshotVerifyView(view, file: file, line: line)
+        STPSnapshotVerifyView(view, file: file, line: line)
     }
 }

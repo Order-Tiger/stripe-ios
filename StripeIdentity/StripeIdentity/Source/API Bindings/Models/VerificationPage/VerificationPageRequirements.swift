@@ -8,9 +8,10 @@
 import Foundation
 @_spi(STP) import StripeCore
 
+extension StripeAPI {
 
+    struct VerificationPageRequirements: Decodable, Equatable {
+        let missing: Set<VerificationPageFieldType>
+    }
 
-struct VerificationPageRequirements: StripeDecodable, Equatable {
-    let missing: [VerificationPageFieldType]
-    var _allResponseFieldsStorage: NonEncodableParameters?
 }

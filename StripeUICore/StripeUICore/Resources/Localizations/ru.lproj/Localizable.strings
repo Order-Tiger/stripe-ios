@@ -1,120 +1,119 @@
-/* The label of a text field that is optional. For example, 'Email (optional)' or 'Name (optional) */
 "%@ (optional)" = "%@ (необязательно)";
 
-/* Caption for Address field on address form */
+"Account number" = "Номер счета";
+
 "Address" = "Адрес";
 
-/* Address line 1 placeholder for billing address form. */
 "Address line 1" = "Адрес (строка 1)";
 
-/* Label for input requesting address line 2, used for international addresses */
 "Address line 2" = "Адрес (строка 2)";
 
-/* Label of an address field in hk */
 "Area" = "Область";
 
-/* Button title to cancel action in an alert */
+"BSB number" = "Номер BSB";
+
+"Billing address is same as shipping" = "Адрес выставления счетов такой же, как адрес доставки";
+
 "Cancel" = "Отмена";
 
-/* Caption for City field on address form */
 "City" = "Город";
 
-/* Text for continue button */
+"Code field" = "Поле кода";
+
+"Company" = "Компания";
+
 "Continue" = "Продолжить";
 
-/* Caption for Country field on address form */
 "Country" = "Страна";
 
-/* Country selector and postal code entry form header title */
 "Country or region" = "Страна или регион";
 
-/* Caption for County field on address form (only countries that use county, like United Kingdom) */
 "County" = "Графство";
 
-/* Label of an address field */
 "Department" = "Департамент";
 
-/* Label for the district field on an address form */
 "District" = "Район";
 
-/* Label of an address field */
 "Do Si" = "Do Si";
 
-/* Done button title */
 "Done" = "Готово";
 
-/* Label of an address field */
+"Double tap to edit" = "Коснитесь дважды, чтобы отредактировать";
+
+"Edit" = "Редактировать";
+
 "Eircode" = "Почтовый индекс (Eircode)";
 
-/* Caption for Email field on address form */
 "Email" = "Эл. почта";
 
-/* Used to describe address in United Arab Emirates */
 "Emirate" = "Эмират";
 
-/* Label for first (given) name field */
+"Error" = "Ошибка";
+
 "First" = "Имя";
 
-/* Error description for incomplete phone number */
+"Full name" = "Имя, фамилия";
+
 "Incomplete phone number" = "Номер телефона введен не полностью";
 
-/* Label of an address field */
+"Invalid UPI ID" = "Недействительный идентификатор UPI";
+
 "Island" = "Остров";
 
-/* Label for last (family) name field */
 "Last" = "Фамилия";
 
-/* Form field header for entering a mobile phone number */
-"Mobile number" = "Номер мобильного";
-
-/* Caption for Name field on address form */
 "Name" = "Имя";
 
-/* No comment provided by engineer. */
+"Name on account" = "Владелец счета";
+
 "OK" = "ОК";
 
-/* Label of an address field */
 "Oblast" = "Область";
 
-/* An option in a dropdown selector indicating the customer's desired selection is not in the list. e.g., 'Choose your bank: Bank1, Bank2, Other' */
 "Other" = "другой";
 
-/* Label of an address field */
 "Parish" = "Приход";
 
-/* Caption for Phone field on address form */
 "Phone" = "Телефон";
 
-/* Short string for postal code (text used in non-US countries) */
 "Postal code" = "Почтовый индекс";
 
-/* Label of an address field */
 "Prefecture" = "Префектура";
 
-/* Caption for Province field on address form (only countries that use province, like Canada) */
 "Province" = "Провинция";
 
-/* Caption for State field on address form (only countries that use state , like United States) */
+"Remove" = "Удалить";
+
+"Remove bank account" = "Удалить банковский счет";
+
+"Remove bank account ending in %@" = "Удалить банковский счет, оканчивающийся на %@";
+
+"Search" = "Поиск";
+
 "State" = "Штат";
 
-/* Label of an address field */
 "Suburb" = "Пригород";
 
-/* Label of an address field */
 "Suburb or city" = "Населенный пункт";
 
-/* An error message. */
+"The BSB you entered is incomplete." = "Введенный код BSB неполон.";
+
 "The ID number you entered is incomplete." = "Номер документа, удостоверяющего личность, введен не полностью.";
 
-/* Label of an address field */
+"The account number you entered is incomplete." = "Номер счета введен не полностью.";
+
 "Town or city" = "Город";
 
-/* Error string when we can't parse a phone number */
+"UPI ID" = "Идентификатор UPI";
+
 "Unable to parse phone number" = "Не удается разобрать номер телефона";
 
-/* Error message when email is invalid */
+"Use rotor to access links" = "Используйте ротор для доступа к ссылкам";
+
+"Your ZIP is incomplete." = "Почтовый индекс введен не полностью.";
+
 "Your email is invalid." = "Недействительный адрес эл. почты.";
 
-/* Short string for zip code (United States only) Please keep to 5 characters or less if possible. */
-"ZIP" = "Почтовый индекс";
+"Your postal code is incomplete." = "Введенный почтовый индекс неполон.";
 
+"ZIP" = "Почтовый индекс";

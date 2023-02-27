@@ -3,10 +3,12 @@
 //  StripeIdentityTests
 //
 //  Created by Mel Ludowise on 1/11/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
 @_spi(STP) import StripeUICore
+
 @testable import StripeIdentity
 
 final class ListViewSnapshotTest: FBSnapshotTestCase {
@@ -23,7 +25,7 @@ final class ListViewSnapshotTest: FBSnapshotTestCase {
             accessibilityLabel: nil,
             accessory: .activityIndicator,
             onTap: nil
-        )
+        ),
     ])
 
     static let manyItemViewModel = ListView.ViewModel(items: [
@@ -58,7 +60,7 @@ final class ListViewSnapshotTest: FBSnapshotTestCase {
 
         listView.tintColor = .systemBlue
 
-//        recordMode = true
+        //        recordMode = true
     }
 
     func testNoItems() {
@@ -88,14 +90,14 @@ final class ListViewSnapshotTest: FBSnapshotTestCase {
     }
 }
 
-private extension ListViewSnapshotTest {
-    func verifyView(
+extension ListViewSnapshotTest {
+    fileprivate func verifyView(
         with viewModel: ListView.ViewModel,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
         listView.configure(with: viewModel)
         listView.autosizeHeight(width: SnapshotTestMockData.mockDeviceWidth)
-        FBSnapshotVerifyView(listView, file: file, line: line)
+        STPSnapshotVerifyView(listView, file: file, line: line)
     }
 }

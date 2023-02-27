@@ -6,7 +6,7 @@
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
 import StripeCoreTestUtils
 @_spi(STP) import StripeUICore
 
@@ -82,12 +82,8 @@ final class ButtonSnapshotTest: FBSnapshotTestCase {
     }
 
     func testAttributedTitle() {
-        let button = Button()
-        button.attributedTitle = NSAttributedString(
-            string: "Hello",
-            attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
-        )
-
+        let button = Button(title: "Hello")
+        button.configuration.titleAttributes = [.underlineStyle: NSUnderlineStyle.single.rawValue]
         verify(button)
     }
 
@@ -104,6 +100,6 @@ final class ButtonSnapshotTest: FBSnapshotTestCase {
         line: UInt = #line
     ) {
         button.autosizeHeight(width: 300)
-        FBSnapshotVerifyView(button, identifier: identifier, file: file, line: line)
+        STPSnapshotVerifyView(button, identifier: identifier, file: file, line: line)
     }
 }

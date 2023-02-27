@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Като алтернатива можете да качите ръчно снимка на документа си за самоличност.";
+
 "App Settings" = "Настройки на приложението";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "Успешно качена снимка на задната страна на шофьорска книжка";
+
+"Back identity card photo successfully uploaded" = "Успешно качена снимка на задната страна на лична карта";
+
 "Back of driver's license" = "Задна страна на свидетелство за управление на МПС";
 
-/* Description of back of identity card image */
 "Back of identity card" = "Задна страна на лична карта";
 
-/* Title displayed when requesting camera permissions */
 "Camera permission" = "Разрешение за камерата";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Камерата не е достъпна";
+
+"Capturing…" = "Заснемане...";
+
 "Choose File" = "Избор на файл";
 
-/* Label for Date of birth field */
+"Consent" = "Съгласие";
+
+"Could not capture image" = "Заснемането беше неуспешно";
+
 "Date of birth" = "Дата на раждане";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Свидетелство за управление на МПС";
+"File Upload" = "Качване на файл";
 
-/* Title of identity document file upload screen */
 "File upload" = "Качване на файл";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Обърнете шофьорската си книжка от другата страна";
+
+"Flip your identity card over to the other side" = "Обърнете личната си карта от другата страна.";
+
+"Front driver's license photo successfully uploaded" = "Успешно качена снимка на предната страна на шофьорска книжка";
+
+"Front identity card photo successfully uploaded" = "Успешно качена снимка на предната страна на лична карта";
+
 "Front of driver's license" = "Предна страна на свидетелство за управление на МПС";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Предна страна на лична карта";
 
-/* Label for ID number section */
+"Go Back" = "Назад";
+
+"Hold still, scanning" = "Застанете неподвижно, сканира се";
+
 "ID Number" = "Идентификационен номер";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Лична карта";
+"ID Type" = "Тип идентификация";
 
-/* Description of passport image */
 "Image of passport" = "Изображение на паспорт";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Зареждане";
+
 "Passport" = "Паспорт";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Успешно качена снимка на паспорт";
+
 "Personal ID number" = "Личен идентификационен номер";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Библиотека със снимки";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Моля, качете изображение на Вашия паспорт.";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Моля, качете изображение на предната и задната част от Вашето свидетелство за управление на МПС.";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Моля, качете изображение на предната и задната част на Вашата лична карта.";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Позиционирайте шофьорската си книжка в центъра на рамката";
+
+"Position your face in the center of the frame." = "Позиционирайте лицето си в центъра на рамката.";
+
+"Position your identity card in the center of the frame" = "Позиционирайте личната си карта в центъра на рамката";
+
+"Position your passport in the center of the frame" = "Позиционирайте паспорта си в центъра на рамката";
+
+"Scan" = "Сканирай";
+
+"Scanned" = "Сканиран";
+
 "Select" = "Избиране";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Изберете местоположение за качване на изображение на задната страна на Вашия документ за самоличност от";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Изберете местоположение за качване на изображение на предната страна на Вашия документ за самоличност от";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Изберете снимка на задната част на шофьорска книжка";
+
+"Select back identity card photo" = "Изберете снимка на задната страна на лична карта";
+
+"Select front driver's license photo" = "Изберете снимка на предната страна на шофьорска книжка";
+
+"Select front identity card photo" = "Изберете снимка на предната страна на лична карта";
+
+"Select passport photo" = "Изберете снимка на паспорт";
+
+"Selfie" = "Селфи";
+
+"Selfie captures" = "Заснети селфита";
+
+"Selfie captures are complete" = "Заснемането на селфита е завършено";
+
 "Take Photo" = "Заснемане";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Опитайте отново";
+"The images of your identity document have not been saved. Do you want to leave?" = "Изображенията на Вашия документ за самоличност не са запазени. Искате ли да излезете?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "Възникна грешка, свързана с достъпа до камерата.";
+
+"Try Again" = "Опитайте отново";
+
 "Unable to establish a connection." = "Не може да бъде осъществена връзка.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Незапазени промени";
+
 "Upload" = "Качване";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Качете снимка";
+
+"Uploading back driver's license photo" = "Качване на снимка на задната страна на шофьорска книжка";
+
+"Uploading back identity card photo" = "Качване на снимка на задната страна на лична карта";
+
+"Uploading front driver's license photo" = "Качване на снимка на предната страна на шофьорска книжка";
+
+"Uploading front identity card photo" = "Качване на снимка на предната страна на лична карта";
+
+"Uploading passport photo" = "Качване на снимка на паспорт";
+
 "Verify your identity" = "Удостоверете Вашата самоличност";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Не успяхме да заснемем изображение с високо качество.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Нуждаем се от разрешение за използване на Вашата камера. Моля, разрешете достъп до камерата в настройките на приложението.";
 
+"You can either try again or upload an image from your device." = "Можете да опитате отново или да качите изображение от устройството си.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Вашите селфи изображения не са запазени. Искате ли да излезете?";

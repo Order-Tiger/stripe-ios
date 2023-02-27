@@ -3,10 +3,12 @@
 //  StripeIdentityTests
 //
 //  Created by Mel Ludowise on 2/14/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
-import FBSnapshotTestCase
+import iOSSnapshotTestCase
+
 @testable import StripeIdentity
 
 final class BiometricConsentViewControllerSnapshotTest: FBSnapshotTestCase {
@@ -15,16 +17,17 @@ final class BiometricConsentViewControllerSnapshotTest: FBSnapshotTestCase {
     override func setUp() {
         super.setUp()
 
-//        recordMode = true
+        //        recordMode = true
     }
 
     func testViewIsConfiguredFromAPI() throws {
         let vc = try BiometricConsentViewController(
-            merchantLogo: SnapshotTestMockData.uiImage(image: .headerIcon),
-            consentContent: BiometricConsentViewControllerSnapshotTest.mockVerificationPage.biometricConsent,
+            brandLogo: SnapshotTestMockData.uiImage(image: .headerIcon),
+            consentContent: BiometricConsentViewControllerSnapshotTest.mockVerificationPage
+                .biometricConsent,
             sheetController: VerificationSheetControllerMock()
         )
 
-        FBSnapshotVerifyView(vc.view)
+        STPSnapshotVerifyView(vc.view)
     }
 }

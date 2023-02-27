@@ -9,13 +9,13 @@ import Foundation
 @_spi(STP) import StripeCore
 import UIKit
 
-@available(iOS 11.2, *)
 protocol CardImageVerificationControllerDelegate: AnyObject {
-    func cardImageVerificationController(_ controller: CardImageVerificationController,
-                                         didFinishWithResult result: CardImageVerificationSheetResult)
+    func cardImageVerificationController(
+        _ controller: CardImageVerificationController,
+        didFinishWithResult result: CardImageVerificationSheetResult
+    )
 }
 
-@available(iOS 11.2, *)
 class CardImageVerificationController {
     weak var delegate: CardImageVerificationControllerDelegate?
 
@@ -31,45 +31,55 @@ class CardImageVerificationController {
     }
 
     func present(
-        with expectedCard: CardImageVerificationExpectedCard?,
-        from presentingViewController: UIViewController
+        with expectedCard: CardImageVerificationExpectedCard,
+        and acceptedImageConfigs: CardImageVerificationAcceptedImageConfigs?,
+        from presentingViewController: UIViewController,
+        animated: Bool = true
     ) {
         /// Guard against basic user error
         guard presentingViewController.presentedViewController == nil else {
             assertionFailure("presentingViewController is already presenting a view controller")
-            let error = CardImageVerificationSheetError.unknown(
+            let error = CardScanSheetError.unknown(
                 debugDescription: "presentingViewController is already presenting a view controller"
             )
-            self.delegate?.cardImageVerificationController(self, didFinishWithResult: .failed(error: error))
+            self.delegate?.cardImageVerificationController(
+                self,
+                didFinishWithResult: .failed(error: error)
+            )
             return
         }
 
         // TODO(jaimepark): Create controller that has configurable view and handles coordination / business logic
-        if let expectedCard = expectedCard {
+        if let expectedCardLast4 = expectedCard.last4 {
             /// Create the view controller for card-set-verification with expected card's last4 and issuer
             let vc = VerifyCardViewController(
-                expectedCard: expectedCard,
+                acceptedImageConfigs: acceptedImageConfigs,
+                configuration: configuration,
+                expectedCardLast4: expectedCardLast4,
+                expectedCardIssuer: expectedCard.issuer
+            )
+            vc.verifyDelegate = self
+            presentingViewController.present(vc, animated: animated)
+        } else {
+            /// Create the view controller for card-add-verification
+            let vc = VerifyCardAddViewController(
+                acceptedImageConfigs: acceptedImageConfigs,
                 configuration: configuration
             )
             vc.verifyDelegate = self
-            presentingViewController.present(vc, animated: true)
-        } else {
-            /// Create the view controller for card-add-verification
-            let vc = VerifyCardAddViewController(configuration: configuration)
-            vc.verifyDelegate = self
-            presentingViewController.present(vc, animated: true)
+            presentingViewController.present(vc, animated: animated)
         }
     }
 
     func dismissWithResult(
         _ presentingViewController: UIViewController,
-        result: CardImageVerificationSheetResult,
-        scanAnalyticsManager: ScanAnalyticsManager
+        result: CardImageVerificationSheetResult
     ) {
         /// Fire-and-forget uploading the scan stats
-        scanAnalyticsManager.generateScanAnalyticsPayload() { [weak self] payload in
+        ScanAnalyticsManager.shared.generateScanAnalyticsPayload(with: configuration) {
+            [weak self] payload in
             guard let self = self,
-                  let payload = payload
+                let payload = payload
             else {
                 return
             }
@@ -90,15 +100,15 @@ class CardImageVerificationController {
 }
 
 // MARK: Verify Card Add Delegate
-@available(iOS 11.2, *)
 extension CardImageVerificationController: VerifyViewControllerDelegate {
     /// User scanned a card successfully. Submit verification frames data to complete verification flow
     func verifyViewControllerDidFinish(
         _ viewController: UIViewController,
         verificationFramesData: [VerificationFramesData],
-        scannedCard: ScannedCard,
-        scanAnalyticsManager: ScanAnalyticsManager
+        scannedCard: ScannedCard
     ) {
+        let completionLoopTask = TrackableTask()
+
         /// Submit verification frames and wait for response for verification flow completion
         configuration.apiClient.submitVerificationFrames(
             cardImageVerificationId: intent.id,
@@ -107,16 +117,20 @@ extension CardImageVerificationController: VerifyViewControllerDelegate {
         ).observe { [weak self] result in
             switch result {
             case .success:
+                completionLoopTask.trackResult(.success)
+                ScanAnalyticsManager.shared.trackCompletionLoopDuration(task: completionLoopTask)
+
                 self?.dismissWithResult(
                     viewController,
-                    result: .completed(scannedCard: scannedCard),
-                    scanAnalyticsManager: scanAnalyticsManager
+                    result: .completed(scannedCard: scannedCard)
                 )
             case .failure(let error):
+                completionLoopTask.trackResult(.failure)
+                ScanAnalyticsManager.shared.trackCompletionLoopDuration(task: completionLoopTask)
+
                 self?.dismissWithResult(
                     viewController,
-                    result: .failed(error: error),
-                    scanAnalyticsManager: scanAnalyticsManager
+                    result: .failed(error: error)
                 )
             }
         }
@@ -125,26 +139,22 @@ extension CardImageVerificationController: VerifyViewControllerDelegate {
     /// User canceled the verification flow
     func verifyViewControllerDidCancel(
         _ viewController: UIViewController,
-        with reason: CancellationReason,
-        scanAnalyticsManager: ScanAnalyticsManager
+        with reason: CancellationReason
     ) {
         dismissWithResult(
             viewController,
-            result: .canceled(reason: reason),
-            scanAnalyticsManager: scanAnalyticsManager
+            result: .canceled(reason: reason)
         )
     }
 
     /// Verification flow has failed
     func verifyViewControllerDidFail(
         _ viewController: UIViewController,
-        with error: Error,
-        scanAnalyticsManager: ScanAnalyticsManager
+        with error: Error
     ) {
         dismissWithResult(
             viewController,
-            result: .failed(error: error),
-            scanAnalyticsManager: scanAnalyticsManager
+            result: .failed(error: error)
         )
     }
 }

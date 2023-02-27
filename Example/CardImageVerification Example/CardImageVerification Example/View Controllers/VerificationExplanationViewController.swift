@@ -5,10 +5,10 @@
 //  Created by Jaime Park on 11/17/21.
 //
 
-import UIKit
 @_spi(STP) import StripeCardScan
+import UIKit
 
-///TODO(jaimepark) Internal structs. Find better place 
+/// TODO(jaimepark) Internal structs. Find better place 
 private struct CIVIntentDetails {
     let id: String
     let clientSecret: String
@@ -66,7 +66,7 @@ private extension VerificationExplanationViewController {
 
     func displayAlert(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let OKAction = UIAlertAction(title: "OK", style: .default, handler:  { _ in
+        let OKAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
             DispatchQueue.main.async {
                 self.navigationController?.popViewController(animated: true)
             }
@@ -81,11 +81,16 @@ private extension VerificationExplanationViewController {
         /// Disable button until card image verification sheet is set
         updateButtonState(isLoading: true)
 
-        let requestJson = [
-            "expected_card[iin]": expectedCardViewModel?.iin ?? "424242",
-            "expected_card[last4]": expectedCardViewModel?.last4 ?? "4242"
-        ]
-        
+        /// Add expected card fields when available
+        var requestJson: [String: Any] = [:]
+        if let last4 = expectedCardViewModel?.last4, !last4.isEmpty {
+            requestJson["expected_card[last4]"] = last4
+        }
+
+        if let iin = expectedCardViewModel?.iin, !iin.isEmpty {
+            requestJson["expected_card[iin]"] = iin
+        }
+
         /// Make request to our verification endpoint
         APIClient.jsonRequest(
             url: URLHelper.cardSet.verifyURL,

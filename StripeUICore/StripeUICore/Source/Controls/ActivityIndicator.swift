@@ -75,7 +75,6 @@ import UIKit
         }
     }
 
-    /// The content layer to use on iOS >= 12. This layer resembles a spiraling comet.
     private lazy var cometLayer: CAGradientLayer = {
         let shape = CAShapeLayer()
         shape.path = makeArcPath(radius: radius, startAngle: 0.05, endAngle: 0.95)
@@ -85,11 +84,7 @@ import UIKit
         shape.fillColor = UIColor.clear.cgColor
 
         let gradientLayer = CAGradientLayer()
-        if #available(iOS 12.0, *) {
-            gradientLayer.type = .conic
-        } else {
-            // Fallback on earlier versions
-        } // Conic gradient requires iOS >= 12.0
+        gradientLayer.type = .conic
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         gradientLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -98,23 +93,8 @@ import UIKit
         return gradientLayer
     }()
 
-    /// The content layer to use on iOS 11. This layer renders as a simple arc shape.
-    private lazy var legacyLayer: CAShapeLayer = {
-        let shape = CAShapeLayer()
-        shape.path = makeArcPath(radius: radius, startAngle: 0, endAngle: 0.7)
-        shape.lineWidth = thickness
-        shape.lineCap = .round
-        shape.fillColor = UIColor.clear.cgColor
-        return shape
-    }()
-
-    /// Resolves to the appropriate content layer depending on the OS version.
     private var contentLayer: CALayer {
-        if #available(iOS 12.0, *) {
-            return cometLayer
-        } else {
-            return legacyLayer
-        }
+        return cometLayer
     }
 
     public override var intrinsicContentSize: CGSize {
@@ -133,7 +113,11 @@ import UIKit
         super.init(frame: .zero)
         layer.addSublayer(contentLayer)
 
+        setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        setContentHuggingPriority(.defaultHigh, for: .vertical)
+
         updateVisibility()
+        updateColor()
 
         NotificationCenter.default.addObserver(
             self,
@@ -153,18 +137,26 @@ import UIKit
 
     public override func tintColorDidChange() {
         super.tintColorDidChange()
-        updatecolor()
+        updateColor()
     }
 
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        updatecolor()
+        updateColor()
     }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
+
+        CATransaction.begin()
+        // `bounds` and `position` are both animatable. Disable actions to turn off
+        // implicit animations when updating them.
+        CATransaction.setDisableActions(true)
+
         contentLayer.bounds = CGRect(origin: .zero, size: intrinsicContentSize)
         contentLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+
+        CATransaction.commit()
     }
 
     public override func willMove(toWindow newWindow: UIWindow?) {
@@ -217,16 +209,12 @@ public extension ActivityIndicator {
 
 private extension ActivityIndicator {
 
-    func updatecolor() {
-        if #available(iOS 12.0, *) {
-            // Tint color gradient from 0% to 100% alpha
-            cometLayer.colors = [
-                tintColor.withAlphaComponent(0).cgColor,
-                tintColor.cgColor
-            ]
-        } else {
-            legacyLayer.strokeColor = tintColor.cgColor
-        }
+    func updateColor() {
+        // Tint color gradient from 0% to 100% alpha
+        cometLayer.colors = [
+            tintColor.withAlphaComponent(0).cgColor,
+            tintColor.cgColor,
+        ]
     }
 
     @objc

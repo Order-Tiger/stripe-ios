@@ -3,6 +3,7 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 9/27/21.
+//  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
@@ -11,38 +12,8 @@ import Foundation
 // Localized strings that are used in multiple contexts. Collected here to avoid re-translation
 // We use snake case to make long names easier to read.
 extension String.Localized {
-    static var error: String {
-        return STPLocalizedString(
-            "Error",
-            "Text for error labels"
-        )
-    }
-
     static var loading: String {
         return STPLocalizedString("Loading", "Status while screen is loading")
-    }
-
-    // MARK: - Document Type Selection
-
-    static var passport: String {
-        return STPLocalizedString(
-            "Passport",
-            "Label of the passport option for document type selection"
-        )
-    }
-
-    static var driving_license: String {
-        return STPLocalizedString(
-            "Driver's license",
-            "Label of the driver's license option for document type selection"
-        )
-    }
-
-    static var id_card: String {
-        return STPLocalizedString(
-            "Identity card",
-            "Label of the ID Card option for document type selection"
-        )
     }
 
     // MARK: - Additional Info fields
@@ -81,6 +52,71 @@ extension String.Localized {
         STPLocalizedString(
             "Select",
             "Button to select a file to upload"
+        )
+    }
+
+    // MARK: - Camera Capturing
+
+    static var file_upload_button: String {
+        STPLocalizedString(
+            "File Upload",
+            "Button that opens file upload screen"
+        )
+    }
+
+    static var try_again_button: String {
+        STPLocalizedString(
+            "Try Again",
+            "Button to attempt to re-scan identity document image"
+        )
+    }
+
+    static var noCameraAccessErrorTitleText: String {
+        STPLocalizedString(
+            "Camera permission",
+            "Error title displayed to the user when camera permissions have been denied"
+        )
+    }
+
+    static var noCameraAccessErrorBodyText: String {
+        STPLocalizedString(
+            "We need permission to use your camera. Please allow camera access in app settings.",
+            "Line 1 of error text displayed to the user when camera permissions have been denied"
+        )
+    }
+
+    static var timeoutErrorTitleText: String {
+        STPLocalizedString(
+            "Could not capture image",
+            "Error title displayed to the user if we could not scan a high quality image of the user's identity document in a reasonable amount of time"
+        )
+    }
+
+    static var timeoutErrorBodyText: String {
+        STPLocalizedString(
+            "We could not capture a high-quality image.",
+            "Error text displayed to the user if we could not scan a high quality image of the user's identity document in a reasonable amount of time"
+        )
+    }
+
+    static var unsavedChanges: String {
+        STPLocalizedString(
+            "Unsaved changes",
+            "Title for warning alert"
+        )
+    }
+
+    static var cameraUnavailableErrorTitleText: String {
+        STPLocalizedString(
+            "Camera unavailable",
+            "Error title displayed to the user when the device's camera is not available"
+        )
+    }
+
+    static var cameraUnavailableErrorBodyText: String {
+        STPLocalizedString(
+            "There was an error accessing the camera.",
+            "Error text displayed to the user when the device's camera is not available"
         )
     }
 }

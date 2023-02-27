@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "Vai arī varat manuāli augšupielādēt identifikācijas dokumenta fotoattēlu.";
+
 "App Settings" = "Lietotnes iestatījumi";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "Autovadītāja apliecības aizmugurējā puse ir veiksmīgi augšupielādēta";
+
+"Back identity card photo successfully uploaded" = "Identifikācijas kartes aizmugurējā puse ir veiksmīgi augšupielādēta";
+
 "Back of driver's license" = "Autovadītāja apliecības aizmugure";
 
-/* Description of back of identity card image */
 "Back of identity card" = "Identifikācijas kartes aizmugure";
 
-/* Title displayed when requesting camera permissions */
 "Camera permission" = "Kameras atļauja";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "Kamera nav pieejama";
+
+"Capturing…" = "Uzņem attēlu…";
+
 "Choose File" = "Izvēlieties failu";
 
-/* Label for Date of birth field */
+"Consent" = "Piekrišana";
+
+"Could not capture image" = "Neizdevās uzņemt attēlu";
+
 "Date of birth" = "Dzimšanas datums";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "Autovadītāja apliecība";
+"File Upload" = "Faila augšupielāde";
 
-/* Title of identity document file upload screen */
 "File upload" = "Faila augšupielāde";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "Apgrieziet autovadītāja apliecību uz otru pusi";
+
+"Flip your identity card over to the other side" = "Apgrieziet identifikācijas karti uz otru pusi";
+
+"Front driver's license photo successfully uploaded" = "Autovadītāja apliecības priekšpuse ir veiksmīgi augšupielādēta";
+
+"Front identity card photo successfully uploaded" = "Identifikācijas kartes priekšpuse ir veiksmīgi augšupielādēta";
+
 "Front of driver's license" = "Autovadītāja apliecības priekšpuse";
 
-/* Description of front of identity card image */
 "Front of identity card" = "Identifikācijas kartes priekšpuse";
 
-/* Label for ID number section */
+"Go Back" = "Doties atpakaļ";
+
+"Hold still, scanning" = "Nekustiniet, notiek skenēšana";
+
 "ID Number" = "ID numurs";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "Identifikācijas karte";
+"ID Type" = "ID veids";
 
-/* Description of passport image */
 "Image of passport" = "Pases attēls";
 
-/* Label of the passport option for document type selection */
+"Loading" = "Ielādē";
+
 "Passport" = "Pase";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "Pases fotoattēls ir veiksmīgi augšupielādēts";
+
 "Personal ID number" = "Personas ID numurs";
 
-/* When selected in an action sheet, opens the device's photo library */
 "Photo Library" = "Attēlu bibliotēka";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "Lūdzu, augšupielādējiet savas pases attēlu.";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "Lūdzu, augšupielādējiet attēlus no jūsu autovadītāja apliecības priekšpuses un aizmugures";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "Lūdzu, augšupielādējiet attēlus no jūsu identifikācijas kartes priekšpuses un aizmugures";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "Gādājiet, lai autovadītāja apliecība būtu kadra centrā";
+
+"Position your face in the center of the frame." = "Gādājiet, lai seja būtu kadra centrā.";
+
+"Position your identity card in the center of the frame" = "Gādājiet, lai identifikācijas karte būtu kadra centrā";
+
+"Position your passport in the center of the frame" = "Gādājiet, lai pase būtu kadra centrā";
+
+"Scan" = "Skenēt";
+
+"Scanned" = "Skenēts";
+
 "Select" = "Atlasīt";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "Atlasiet atrašanās vietu, kurā augšupielādēt jūsu identifikācijas dokumenta aizmuguri no";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "Atlasiet atrašanās vietu, kurā augšupielādēt jūsu identifikācijas dokumenta priekšpusi no";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "Atlasīt autovadītāja apliecības aizmugurējo fotoattēlu";
+
+"Select back identity card photo" = "Atlasīt identifikācijas kartes aizmugurējo fotoattēlu";
+
+"Select front driver's license photo" = "Atlasīt autovadītāja apliecības priekšpuses fotoattēlu";
+
+"Select front identity card photo" = "Atlasīt identifikācijas kartes priekšpuses fotoattēlu";
+
+"Select passport photo" = "Atlasīt pases fotoattēlu";
+
+"Selfie" = "Pašportrets";
+
+"Selfie captures" = "Pašportreta uzņēmumi";
+
+"Selfie captures are complete" = "Pašportreta uzņēmumi ir pabeigti";
+
 "Take Photo" = "Uzņemt attēlu";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "Mēģināt vēlreiz";
+"The images of your identity document have not been saved. Do you want to leave?" = "Jūsu identifikācijas dokumenta attēli nav saglabāti. Vai vēlaties iziet?";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "Radās kļūda, piekļūstot kamerai.";
+
+"Try Again" = "Mēģināt vēlreiz";
+
 "Unable to establish a connection." = "Nevar izveidot savienojumu.";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "Nesaglabātās izmaiņas";
+
 "Upload" = "Augšupielādēt";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "Augšupielādēt fotoattēlu";
+
+"Uploading back driver's license photo" = "Augšupielādē autovadītāja apliecības aizmugurējo fotoattēlu";
+
+"Uploading back identity card photo" = "Augšupielādē identifikācijas kartes aizmugurējo fotoattēlu";
+
+"Uploading front driver's license photo" = "Augšupielādē autovadītāja apliecības priekšpuses fotoattēlu";
+
+"Uploading front identity card photo" = "Augšupielādē identifikācijas kartes priekšpuses fotoattēlu";
+
+"Uploading passport photo" = "Augšupielādē pases fotoattēlu";
+
 "Verify your identity" = "Verificējiet savu identitāti";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "Neizdevās uzņemt augstas kvalitātes attēlu.";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "Lai izmantotu jūsu kameru, mums ir nepieciešama jūsu atļauja. Lūdzu, savos lietotnes iestatījumos iespējojiet kameras piekļuvi.";
 
+"You can either try again or upload an image from your device." = "Varat mēģināt vēlreiz vai augšupielādēt attēlu no jūsu ierīces.";
+
+"Your selfie images have not been saved. Do you want to leave?" = "Jūsu pašportreta attēli nav saglabāti. Vai vēlaties iziet?";

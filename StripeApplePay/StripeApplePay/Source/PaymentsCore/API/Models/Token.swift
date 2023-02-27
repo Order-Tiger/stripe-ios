@@ -1,6 +1,6 @@
 //
 //  Token.swift
-//  StripeiOS
+//  StripeApplePay
 //
 //  Created by David Estes on 7/14/21.
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
@@ -11,19 +11,19 @@ import PassKit
 @_spi(STP) import StripeCore
 
 extension StripeAPI {
-    struct Token: StripeDecodable {
+    struct Token: UnknownFieldsDecodable {
         var _allResponseFieldsStorage: NonEncodableParameters?
-        
+
         /// The value of the token. You can store this value on your server and use it to make charges and customers.
-        /// - seealso: https://stripe.com/docs/charges
+        /// - seealso: https://stripe.com/docs/payments/charges-api
         let id: String
         /// Whether or not this token was created in livemode. Will be YES if you used your Live Publishable Key, and NO if you used your Test Publishable Key.
         var livemode: Bool
         /// The type of this token.
         var type: TokenType
-        
+
         /// Possible Token types
-        enum TokenType: String, Decodable {
+        enum TokenType: String, SafeEnumCodable {
             /// Account token type
             case account
             /// Bank account token type
@@ -34,19 +34,19 @@ extension StripeAPI {
             case PII = "pii"
             /// CVC update token type
             case cvcUpdate = "cvc_update"
+            case unparsable
         }
-        
+
         /// The credit card details that were used to create the token. Will only be set if the token was created via a credit card or Apple Pay, otherwise it will be
         /// nil.
-        @IncludeUnknownFields
         var card: Card?
         // /// The bank account details that were used to create the token. Will only be set if the token was created with a bank account, otherwise it will be nil.
         // Not yet implemented.
         //    var bankAccount: BankAccount?
         /// When the token was created.
         var created: Date?
-        
-        struct Card: StripeDecodable {
+
+        struct Card: UnknownFieldsDecodable {
             var _allResponseFieldsStorage: NonEncodableParameters?
 
             /// The last 4 digits of the card.
@@ -77,13 +77,14 @@ extension StripeAPI {
 
             /// If address_line1 was provided, results of the check.
             var addressLine1Check: AddressCheck?
-            
+
             /// Results of an address check.
-            enum AddressCheck: String, Decodable {
+            enum AddressCheck: String, SafeEnumCodable {
                 case pass
                 case fail
                 case unavailable
                 case unchecked
+                case unparsable
             }
 
             /// Address line 2 (Apartment/Suite/Unit/Building).
@@ -91,41 +92,21 @@ extension StripeAPI {
 
             /// State/County/Province/Region.
             var addressState: String?
-            
+
             /// ZIP or postal code.
             var addressZip: String?
 
             /// If address_zip was provided, results of the check.
             var addressZipCheck: AddressCheck?
-            
+
             /// The issuer of the card.
-            var brand: Brand = .unknown
-            
-            /// The various card brands to which a payment card can belong.
-            enum Brand: String, Decodable {
-                /// Visa card
-                case visa = "Visa"
-                /// American Express card
-                case amex = "American Express"
-                /// Mastercard card
-                case mastercard = "MasterCard"
-                /// Discover card
-                case discover = "Discover"
-                /// JCB card
-                case JCB = "JCB"
-                /// Diners Club card
-                case dinersClub = "Diners Club"
-                /// UnionPay card
-                case unionPay = "UnionPay"
-                /// An unknown card brand type
-                case unknown = "Unknown"
-            }
-            
+            var brand: CardBrand = .unknown
+
             /// The funding source for the card (credit, debit, prepaid, or other)
-            var funding: FundingType = .other
-            
+            var funding: FundingType = .unknown
+
             /// The various funding sources for a payment card.
-            enum FundingType: String, Decodable {
+            enum FundingType: String, SafeEnumCodable {
                 /// Debit card funding
                 case debit
                 /// Credit card funding
@@ -133,7 +114,8 @@ extension StripeAPI {
                 /// Prepaid card funding
                 case prepaid
                 /// An other or unknown type of funding source.
-                case other
+                case unknown
+                case unparsable
             }
 
             /// Two-letter ISO code representing the issuing country of the card.

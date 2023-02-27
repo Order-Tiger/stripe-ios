@@ -1,13 +1,18 @@
 //
 //  STPTelemetryClientFunctionalTest.swift
-//  StripeiOS Tests
+//  StripeApplePayTests
 //
 //  Created by Yuki Tokuhiro on 5/21/21.
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
 import XCTest
+
+// swift-format-ignore
 @testable @_spi(STP) import StripeApplePay
+
+// swift-format-ignore
+@testable @_spi(STP) import StripeCore
 
 class STPTelemetryClientFunctionalTest: XCTestCase {
     func testSendFraudDetectionData() {
@@ -17,7 +22,7 @@ class STPTelemetryClientFunctionalTest: XCTestCase {
         FraudDetectionData.shared.muid = nil
         FraudDetectionData.shared.guid = nil
         let sendTelemetry1 = expectation(description: "")
-        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { result in
+        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { _ in
             sendTelemetry1.fulfill()
         }
         waitForExpectations(timeout: 10, handler: nil)
@@ -31,7 +36,7 @@ class STPTelemetryClientFunctionalTest: XCTestCase {
 
         let sendTelemetry2 = expectation(description: "")
         // Sending telemetry again...
-        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { result in
+        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { _ in
             sendTelemetry2.fulfill()
         }
         // ...gives the same FraudDetectionData
@@ -42,14 +47,15 @@ class STPTelemetryClientFunctionalTest: XCTestCase {
             XCTFail()
             return
         }
-        XCTAssertTrue(sidCreationDate > Date(timeIntervalSinceNow: -10)) // sanity check creation date looks right
+        // sanity check creation date looks right
+        XCTAssertTrue(sidCreationDate > Date(timeIntervalSinceNow: -10))
         waitForExpectations(timeout: 10, handler: nil)
 
         // Expiring the FraudDetectionData
         FraudDetectionData.shared.sidCreationDate = Date(timeIntervalSinceNow: -999999)
         let sendTelemetry3 = expectation(description: "")
         // ...and sending telemetry again
-        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { result in
+        STPTelemetryClient.shared.sendTelemetryData(forceSend: true) { _ in
             sendTelemetry3.fulfill()
         }
         waitForExpectations(timeout: 10, handler: nil)

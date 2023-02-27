@@ -3,6 +3,7 @@
 //  StripeIdentity
 //
 //  Created by Mel Ludowise on 2/25/22.
+//  Copyright © 2022 Stripe, Inc. All rights reserved.
 //
 
 import Foundation
@@ -11,7 +12,7 @@ import Vision
 // MARK: - VisionBasedDetector
 
 /// A Detector that scans an image using a VisionRequest
-@available(iOS 13, *)
+
 protocol VisionBasedDetector {
     associatedtype Configuration
     associatedtype Output: VisionBasedDetectorOutput where Output.Detector == Self
@@ -19,37 +20,35 @@ protocol VisionBasedDetector {
     /// Configuration for this detector
     var configuration: Configuration { get }
 
-    /**
-     Called every time a scan is attempted. If a scan should be skipped, returns
-     the output that should be used. If a scan should not be skipped, returns nil.
-     */
+    /// Tracks performance metrics for this detector
+    var metricsTracker: MLDetectorMetricsTracker? { get }
+
+    /// Called every time a scan is attempted. If a scan should be skipped, returns
+    /// the output that should be used. If a scan should not be skipped, returns nil.
     func visionBasedDetectorOutputIfSkipping() -> Output?
 
     /// Create a vision request for this detector
     func visionBasedDetectorMakeRequest() -> VNImageBasedRequest
 }
 
-@available(iOS 13, *)
 extension VisionBasedDetector {
 
-    /**
-     Scans a given image and returns a future that will resolve to the
-     detector's output.
-
-     - Note:
-     This method may take significant time to complete and will block the
-     current thread until it's done processing the image. Never call this method
-     from the main thread but instead dispatch to a worker queue before calling
-     this method.
-
-     - Parameters:
-       - pixelBuffer: The image to scan
-       - regionOfInterest: A region of interest to scan within the image
-
-     - Returns: The detector's output
-
-     - Throws: An error if the image could not be scanned
-     */
+    /// Scans a given image and returns a future that will resolve to the
+    /// detector's output.
+    ///
+    /// - Note:
+    /// This method may take significant time to complete and will block the
+    /// current thread until it's done processing the image. Never call this method
+    /// from the main thread but instead dispatch to a worker queue before calling
+    /// this method.
+    ///
+    /// - Parameters:
+    ///   - pixelBuffer: The image to scan
+    ///   - regionOfInterest: A region of interest to scan within the image
+    ///
+    /// - Returns: The detector's output
+    ///
+    /// - Throws: An error if the image could not be scanned
     func scanImage(
         pixelBuffer: CVPixelBuffer,
         regionOfInterest: CGRect? = nil
@@ -70,29 +69,38 @@ extension VisionBasedDetector {
             request.regionOfInterest = regionOfInterest
         }
 
+        // Track when inference started
+        let inferenceStart = Date()
+
         try handler.perform([request])
 
-        /*
-         NOTE: Vision changed the return type of `results` from `[Any]?` to
-         `[VNObservation]?` without an availability gate. Storing it as an
-         intermediate `[Any]?` type and then casting to `[VNObservation]` is the
-         only way to satisfy the compiler for all supported OS versions.
-         */
-        let results: [Any]? = request.results
-        let observations = (results as? [VNObservation]) ?? []
+        // Track when inference ended
+        let inferenceEnd = Date()
 
-        return try Output(
-            detector: self,
-            observations: observations,
-            originalImageSize: imageSize
+        let outputResult = Result {
+            try Output(
+                detector: self,
+                observations: request.results ?? [],
+                originalImageSize: imageSize
+            )
+        }
+        // Track when post-processing ended
+        let postProcessEnd = Date()
+
+        metricsTracker?.trackScan(
+            inferenceStart: inferenceStart,
+            inferenceEnd: inferenceEnd,
+            postProcessEnd: postProcessEnd
         )
+
+        return try outputResult.get()
     }
 }
 
 // MARK: - VisionBasedDetectorOutput
 
 /// Output protocol for VisionBasedDetector
-@available(iOS 13, *)
+
 protocol VisionBasedDetectorOutput {
     associatedtype Detector: VisionBasedDetector
 
@@ -106,7 +114,7 @@ protocol VisionBasedDetectorOutput {
 // MARK: - OptionalVisionBasedDetectorOutput
 
 /// Optional variation of VisionBasedDetectorOutput
-@available(iOS 13, *)
+
 protocol OptionalVisionBasedDetectorOutput {
     associatedtype Detector: VisionBasedDetector
 
@@ -117,7 +125,6 @@ protocol OptionalVisionBasedDetectorOutput {
     ) throws
 }
 
-@available(iOS 13, *)
 extension Optional: VisionBasedDetectorOutput where Wrapped: OptionalVisionBasedDetectorOutput {
     typealias Detector = Wrapped.Detector
 

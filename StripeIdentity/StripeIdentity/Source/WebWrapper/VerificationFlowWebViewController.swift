@@ -6,73 +6,81 @@
 //  Copyright © 2021 Stripe, Inc. All rights reserved.
 //
 
-import UIKit
 import AVKit
-import WebKit
 @_spi(STP) import StripeCore
+import UIKit
+import WebKit
 
+@available(iOS 14.3, *)
 @available(iOSApplicationExtension, unavailable)
 protocol VerificationFlowWebViewControllerDelegate: AnyObject {
-    /**
-     Invoked when the user has closed the `VerificationFlowWebViewController`.
-     - Parameters:
-       - viewController: The view controller that was closed.
-       - result: The result of the user's verification flow.
-                 Value is `.flowCompleted` if the user successfully completed the flow.
-                 Value is `.flowCanceled` if the user closed the view controller prior to completing the flow.
-     */
-    func verificationFlowWebViewController(_ viewController: VerificationFlowWebViewController, didFinish result: IdentityVerificationSheet.VerificationFlowResult)
+    /// Invoked when the user has closed the `VerificationFlowWebViewController`.
+    /// - Parameters:
+    ///   - viewController: The view controller that was closed.
+    ///   - result: The result of the user's verification flow.
+    ///             Value is `.flowCompleted` if the user successfully completed the flow.
+    ///             Value is `.flowCanceled` if the user closed the view controller prior to completing the flow.
+    func verificationFlowWebViewController(
+        _ viewController: VerificationFlowWebViewController,
+        didFinish result: IdentityVerificationSheet.VerificationFlowResult
+    )
 }
 
-/**
- View controller that wraps the Identity Verification web flow. It starts at the URL
- `https://verify.stripe.com/start/{{url_token}}`
-
- If the user proceeds to the URL `https://verify.stripe.com/success` prior to closing the view,
- then a `.flowCompleted` result is sent to the view controller delegate's `didFinish` method.
-
- If the user closes the view controller prior to reaching the `/success` page, then a `.flowCanceled`
- result is sent to the view controller delegate's `didFinish` method.
-
- - NOTE(mludowise|RUN_MOBILESDK-120):
- This class should be marked as `@available(iOS 14.3, *)` when our CI is updated to run tests on iOS 14.
- */
+/// View controller that wraps the Identity Verification web flow. It starts at the URL
+/// `https://verify.stripe.com/start/{{url_token}}`
+///
+/// If the user proceeds to the URL `https://verify.stripe.com/success` prior to closing the view,
+/// then a `.flowCompleted` result is sent to the view controller delegate's `didFinish` method.
+///
+/// If the user closes the view controller prior to reaching the `/success` page, then a `.flowCanceled`
+/// result is sent to the view controller delegate's `didFinish` method.
+@available(iOS 14.3, *)
 @available(iOSApplicationExtension, unavailable)
 final class VerificationFlowWebViewController: UIViewController {
 
     weak var delegate: VerificationFlowWebViewControllerDelegate?
 
     private(set) var verificationWebView: VerificationFlowWebView?
-    
-    private let clientSecret: VerificationClientSecret
+
+    private let startUrl: URL
 
     /// Result to return to the delegate when the ViewController is closed
     private var result: IdentityVerificationSheet.VerificationFlowResult = .flowCanceled
 
-    /**
-     Instantiates a new `VerificationFlowWebViewController`.
-     - Parameters:
-       - clientSecret: The VerificationSession client secret.
-       - delegate: Optional delegate for the `VerificationFlowWebViewController`
-     */
-    init(clientSecret: VerificationClientSecret,
-         delegate: VerificationFlowWebViewControllerDelegate?) {
-        self.clientSecret = clientSecret
+    init(
+        startUrl: URL,
+        delegate: VerificationFlowWebViewControllerDelegate?
+    ) {
+        self.startUrl = startUrl
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate
         setupNavbar()
     }
 
-    required init?(coder: NSCoder) {
+    /// Instantiates a new `VerificationFlowWebViewController`.
+    /// - Parameters:
+    ///   - clientSecret: The VerificationSession client secret.
+    ///   - delegate: Optional delegate for the `VerificationFlowWebViewController`
+    convenience init(
+        clientSecret: VerificationClientSecret,
+        delegate: VerificationFlowWebViewControllerDelegate?
+    ) {
+        self.init(
+            startUrl: VerifyWebURLHelper.startURL(fromToken: clientSecret.urlToken),
+            delegate: delegate
+        )
+    }
+
+    required init?(
+        coder: NSCoder
+    ) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    /**
-     Instantiates a new `VerificationFlowWebViewController` inside of a navigation controller.
-     - Parameters:
-       - clientSecret: The VerificationSession client secret.
-       - delegate: Optional delegate for the `VerificationFlowWebViewController`
-     */
+    /// Instantiates a new `VerificationFlowWebViewController` inside of a navigation controller.
+    /// - Parameters:
+    ///   - clientSecret: The VerificationSession client secret.
+    ///   - delegate: Optional delegate for the `VerificationFlowWebViewController`
     static func makeInNavigationController(
         clientSecret: VerificationClientSecret,
         delegate: VerificationFlowWebViewControllerDelegate?
@@ -87,15 +95,11 @@ final class VerificationFlowWebViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Set the background color while we wait for the use to grant camera
         // permissions, otherwise the view controller is transparent while the
         // camera permissions prompt is displayed.
-        //
-        // TODO(mludowise|RUN_MOBILESDK-120): Remove #available clause when
-        // class is marked as `@available(iOS 14.3, *)`
-        if verificationWebView == nil,
-           #available(iOS 13.0, *) {
+        if verificationWebView == nil {
             view.backgroundColor = .systemBackground
         }
     }
@@ -112,7 +116,7 @@ final class VerificationFlowWebViewController: UIViewController {
         requestCameraPermissionsIfNeeded(completion: { [weak self] in
             guard let self = self else { return }
 
-            self.verificationWebView = VerificationFlowWebView(initialURL: VerifyWebURLHelper.startURL(fromToken: self.clientSecret.urlToken))
+            self.verificationWebView = VerificationFlowWebView(initialURL: self.startUrl)
 
             // Install view
             if self.verificationWebView !== self.view {
@@ -136,10 +140,14 @@ final class VerificationFlowWebViewController: UIViewController {
 
 // MARK: - Private
 
+@available(iOS 14.3, *)
 @available(iOSApplicationExtension, unavailable)
-private extension VerificationFlowWebViewController {
-    func setupNavbar() {
-        title = STPLocalizedString("Verify your identity", "Displays in the navigation bar title of the Identity Verification Sheet")
+extension VerificationFlowWebViewController {
+    fileprivate func setupNavbar() {
+        title = STPLocalizedString(
+            "Verify your identity",
+            "Displays in the navigation bar title of the Identity Verification Sheet"
+        )
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: String.Localized.close,
             style: .plain,
@@ -148,7 +156,7 @@ private extension VerificationFlowWebViewController {
         )
     }
 
-    func requestCameraPermissionsIfNeeded(completion: @escaping () -> Void) {
+    fileprivate func requestCameraPermissionsIfNeeded(completion: @escaping () -> Void) {
         // NOTE: We won't do anything different if the user does vs. doesn't
         // grant camera access. The web flow already handles both cases.
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -159,25 +167,26 @@ private extension VerificationFlowWebViewController {
                     completion()
                 }
             }
-            
+
         case .authorized,
-             .denied,
-             .restricted:
+            .denied,
+            .restricted:
             completion()
-            
+
         @unknown default:
             completion()
         }
     }
 
     @objc
-    func didTapCloseButton() {
+    fileprivate func didTapCloseButton() {
         dismiss(animated: true, completion: nil)
     }
 }
 
 // MARK: - VerificationFlowWebViewDelegate
 
+@available(iOS 14.3, *)
 @available(iOSApplicationExtension, unavailable)
 extension VerificationFlowWebViewController: VerificationFlowWebViewDelegate {
 
@@ -187,7 +196,7 @@ extension VerificationFlowWebViewController: VerificationFlowWebViewDelegate {
         }
     }
 
-    func verificationFlowWebViewDidFinishLoading(_ view: VerificationFlowWebView) { }
+    func verificationFlowWebViewDidFinishLoading(_ view: VerificationFlowWebView) {}
 
     func verificationFlowWebViewDidClose(_ view: VerificationFlowWebView) {
         dismiss(animated: true, completion: nil)

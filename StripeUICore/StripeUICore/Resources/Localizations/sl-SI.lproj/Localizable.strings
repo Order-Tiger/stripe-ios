@@ -1,120 +1,119 @@
-/* The label of a text field that is optional. For example, 'Email (optional)' or 'Name (optional) */
 "%@ (optional)" = "%@ (izbirno)";
 
-/* Caption for Address field on address form */
+"Account number" = "Številka računa";
+
 "Address" = "Naslov";
 
-/* Address line 1 placeholder for billing address form. */
 "Address line 1" = "Naslov 1";
 
-/* Label for input requesting address line 2, used for international addresses */
 "Address line 2" = "Vrstica naslova 2";
 
-/* Label of an address field in hk */
 "Area" = "Območje";
 
-/* Button title to cancel action in an alert */
+"BSB number" = "Številka BSB";
+
+"Billing address is same as shipping" = "Naslov za obračunavanje je isti kot dostavni naslov";
+
 "Cancel" = "Prekliči";
 
-/* Caption for City field on address form */
 "City" = "Mesto";
 
-/* Text for continue button */
+"Code field" = "Polje za kodo";
+
+"Company" = "Podjetje";
+
 "Continue" = "Nadaljuj";
 
-/* Caption for Country field on address form */
 "Country" = "Država";
 
-/* Country selector and postal code entry form header title */
 "Country or region" = "Država ali regija";
 
-/* Caption for County field on address form (only countries that use county, like United Kingdom) */
 "County" = "Okraj";
 
-/* Label of an address field */
 "Department" = "Oddelek";
 
-/* Label for the district field on an address form */
 "District" = "Okrožje";
 
-/* Label of an address field */
 "Do Si" = "Do Si";
 
-/* Done button title */
 "Done" = "Dokončano";
 
-/* Label of an address field */
+"Double tap to edit" = "Dvotapnite, da uredite";
+
+"Edit" = "Uredi";
+
 "Eircode" = "Eircode";
 
-/* Caption for Email field on address form */
 "Email" = "E-poštni naslov";
 
-/* Used to describe address in United Arab Emirates */
 "Emirate" = "Emirat";
 
-/* Label for first (given) name field */
+"Error" = "Napaka";
+
 "First" = "Ime";
 
-/* Error description for incomplete phone number */
+"Full name" = "Polno ime";
+
 "Incomplete phone number" = "Nepopolna telefonska številka mobilnega telefona.";
 
-/* Label of an address field */
+"Invalid UPI ID" = "Neveljaven UPI ID";
+
 "Island" = "Otok";
 
-/* Label for last (family) name field */
 "Last" = "Priimek";
 
-/* Form field header for entering a mobile phone number */
-"Mobile number" = "Številka mobilnega telefona";
-
-/* Caption for Name field on address form */
 "Name" = "Ime";
 
-/* No comment provided by engineer. */
+"Name on account" = "Ime na računu";
+
 "OK" = "V redu";
 
-/* Label of an address field */
 "Oblast" = "Oblast";
 
-/* An option in a dropdown selector indicating the customer's desired selection is not in the list. e.g., 'Choose your bank: Bank1, Bank2, Other' */
 "Other" = "Drugo";
 
-/* Label of an address field */
 "Parish" = "Župnija";
 
-/* Caption for Phone field on address form */
 "Phone" = "Telefon";
 
-/* Short string for postal code (text used in non-US countries) */
 "Postal code" = "Poštna številka";
 
-/* Label of an address field */
 "Prefecture" = "Prefektura";
 
-/* Caption for Province field on address form (only countries that use province, like Canada) */
 "Province" = "Provinca";
 
-/* Caption for State field on address form (only countries that use state , like United States) */
+"Remove" = "Odstrani";
+
+"Remove bank account" = "Odstranjevanje bančnega računa";
+
+"Remove bank account ending in %@" = "Odstranite bančni račun, ki se konča s števkami %@";
+
+"Search" = "Iskanje";
+
 "State" = "Zvezna država";
 
-/* Label of an address field */
 "Suburb" = "Predmestje";
 
-/* Label of an address field */
 "Suburb or city" = "Predmestje ali mesto";
 
-/* An error message. */
+"The BSB you entered is incomplete." = "Vneseni BSB ni popoln.";
+
 "The ID number you entered is incomplete." = "Vnesena številka osebnega dokumenta ni popolna.";
 
-/* Label of an address field */
+"The account number you entered is incomplete." = "Vnesena številka računa ni popolna.";
+
 "Town or city" = "Kraj ali mesto";
 
-/* Error string when we can't parse a phone number */
+"UPI ID" = "UPI ID";
+
 "Unable to parse phone number" = "Telefonske številke ni mogoče razčleniti";
 
-/* Error message when email is invalid */
+"Use rotor to access links" = "Uporabite rotor za dostop do povezav";
+
+"Your ZIP is incomplete." = "Vaša poštna številka ni popolna.";
+
 "Your email is invalid." = "Vaš e-poštni naslov ni veljaven.";
 
-/* Short string for zip code (United States only) Please keep to 5 characters or less if possible. */
-"ZIP" = "Poštna številka";
+"Your postal code is incomplete." = "Vaša poštna številka ni popolna.";
 
+"ZIP" = "Poštna številka";

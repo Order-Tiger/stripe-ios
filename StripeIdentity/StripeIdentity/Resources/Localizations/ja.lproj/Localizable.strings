@@ -1,84 +1,137 @@
-/* Opens the app's settings in the Settings app */
+"Alternatively, you may manually upload a photo of your identity document." = "または、身分証明書の写真を手動でアップロードすることもできます。";
+
 "App Settings" = "アプリの設定";
 
-/* Description of back of driver's license image */
+"Back driver's license photo successfully uploaded" = "運転免許証の裏面の写真のアップロードが完了しました";
+
+"Back identity card photo successfully uploaded" = "身分証明書の裏面の写真のアップロードが完了しました";
+
 "Back of driver's license" = "運転免許証の裏面";
 
-/* Description of back of identity card image */
 "Back of identity card" = "身分証明書の裏面";
 
-/* Title displayed when requesting camera permissions */
-"Camera permission" = "カメラへのアクセス許可";
+"Camera permission" = "カメラの使用許可";
 
-/* When selected in an action sheet, opens the device's file system browser */
+"Camera unavailable" = "カメラを利用できません";
+
+"Capturing…" = "キャプチャーしています...";
+
 "Choose File" = "ファイルを選択";
 
-/* Label for Date of birth field */
+"Consent" = "同意する";
+
+"Could not capture image" = "画像をキャプチャーできませんでした";
+
 "Date of birth" = "生年月日";
 
-/* Label of the driver's license option for document type selection */
-"Driver's license" = "運転免許証";
+"File Upload" = "ファイルをアップロード";
 
-/* Title of identity document file upload screen */
 "File upload" = "ファイルのアップロード";
 
-/* Description of front of driver's license image */
+"Flip your driver's license over to the other side" = "運転免許証を裏返してください";
+
+"Flip your identity card over to the other side" = "身分証明書を裏返してください";
+
+"Front driver's license photo successfully uploaded" = "運転免許証の表面の写真のアップロードが完了しました";
+
+"Front identity card photo successfully uploaded" = "身分証明書の表面の写真のアップロードが完了しました";
+
 "Front of driver's license" = "運転免許証の表面";
 
-/* Description of front of identity card image */
 "Front of identity card" = "身分証明書の表面";
 
-/* Label for ID number section */
+"Go Back" = "戻る";
+
+"Hold still, scanning" = "動かさないでください、スキャンしています";
+
 "ID Number" = "ID 番号";
 
-/* Label of the ID Card option for document type selection */
-"Identity card" = "身分証明書";
+"ID Type" = "ID タイプ";
 
-/* Description of passport image */
 "Image of passport" = "パスポートの画像";
 
-/* Label of the passport option for document type selection */
+"Loading" = "読み込み中";
+
 "Passport" = "パスポート";
 
-/* Label for the personal id number field in the hosted verification details collection form for countries without an exception */
+"Passport photo successfully uploaded" = "パスポートの写真のアップロードが完了しました";
+
 "Personal ID number" = "身分証明書番号";
 
-/* When selected in an action sheet, opens the device's photo library */
-"Photo Library" = "フォトライブラリ";
+"Photo Library" = "フォトライブラリー";
 
-/* Instructions for uploading images of passport */
 "Please upload an image of your passport" = "パスポートの画像をアップロードしてください";
 
-/* Instructions for uploading images of drivers license */
 "Please upload images of the front and back of your driver's license" = "運転免許証の表裏両面の画像をアップロードしてください";
 
-/* Instructions for uploading images of identity card */
 "Please upload images of the front and back of your identity card" = "身分証明書の表裏両面の画像をアップロードしてください";
 
-/* Label of a button displayed below a payment method form. Tapping the button closes the form and uses the entered payment method details for checkout in the next step */
+"Position your driver's license in the center of the frame" = "運転免許証をフレームの中央に置いてください";
+
+"Position your face in the center of the frame." = "フレームの中央に顔を置いてください。";
+
+"Position your identity card in the center of the frame" = "身分証明書をフレームの中央に置いてください";
+
+"Position your passport in the center of the frame" = "パスポートをフレームの中央に置いてください";
+
+"Scan" = "スキャン";
+
+"Scanned" = "スキャン終了";
+
 "Select" = "選択";
 
-/* Help text for action sheet that presents ways to upload the back of an identity document image */
 "Select a location to upload the back of your identity document from" = "身分証明書の裏面をどこからアップロードするのかを選択してください";
 
-/* Help text for action sheet that presents ways to upload the front of an identity document image */
 "Select a location to upload the front of your identity document from" = "身分証明書の表面をどこからアップロードするのかを選択してください";
 
-/* When selected in an action sheet, opens the device's camera interface */
+"Select back driver's license photo" = "運転免許証の裏面の写真を選択";
+
+"Select back identity card photo" = "身分証明書の裏面の写真を選択";
+
+"Select front driver's license photo" = "運転免許証の表面の写真を選択";
+
+"Select front identity card photo" = "身分証明書の表面の写真を選択";
+
+"Select passport photo" = "パスポートの写真を選択";
+
+"Selfie" = "セルフィ―";
+
+"Selfie captures" = "セルフィ―のキャプチャー";
+
+"Selfie captures are complete" = "セルフィ―のキャプチャーが完了しました";
+
 "Take Photo" = "写真を撮る";
 
-/* Button to reload web view if we were unable to connect. */
-"Try again" = "もう一度お試しください";
+"The images of your identity document have not been saved. Do you want to leave?" = "身分証明書の画像が保存されていません。終了しますか？";
 
-/* Error message that displays when we&apos;re unable to connect to the server. */
+"There was an error accessing the camera." = "カメラへのアクセス中にエラーが発生しました。";
+
+"Try Again" = "やり直す";
+
 "Unable to establish a connection." = "接続を確立できません";
 
-/* Back button label for the identity document file upload screen */
+"Unsaved changes" = "保存されていない変更";
+
 "Upload" = "アップロード";
 
-/* Displays in the navigation bar title of the Identity Verification Sheet */
+"Upload a Photo" = "写真をアップロード";
+
+"Uploading back driver's license photo" = "運転免許証の裏面をアップロードしています";
+
+"Uploading back identity card photo" = "身分証明書の裏面をアップロードしています";
+
+"Uploading front driver's license photo" = "運転免許証の表面をアップロードしています";
+
+"Uploading front identity card photo" = "身分証明書の表面をアップロードしています";
+
+"Uploading passport photo" = "パスポートの写真をアップロードしています";
+
 "Verify your identity" = "本人確認を行う";
 
-/* Text displayed when requesting camera permissions */
+"We could not capture a high-quality image." = "高画質の画像をキャプチャーできませんでした。";
+
 "We need permission to use your camera. Please allow camera access in app settings." = "カメラへのアクセス許可が必要です。アプリの設定でカメラへのアクセスを許可してください。";
 
+"You can either try again or upload an image from your device." = "もう一度お試しいただくか、デバイスから画像をアプロードしてください。";
+
+"Your selfie images have not been saved. Do you want to leave?" = "自撮りの画像が保存されていません。終了しますか？";
